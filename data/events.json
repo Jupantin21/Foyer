@@ -18,7 +18,21 @@
         "2026-05-16",
         "2026-05-07"
       ]
+    },
+    {
+      "id": "morm6aegqrhjco",
+      "status": "confirmado",
+      "title": "Becket - Fim de Partida",
+      "type": "teatro",
+      "time": "20:00",
+      "location": "Sesc Pinheiros",
+      "price": "A confirmar",
+      "link": "",
+      "author": "Ju",
+      "date": "2026-05-08",
+      "suggestedDates": [],
+      "createdAt": 1777924217896
     }
   ],
-  "updatedAt": 1777924081223
+  "updatedAt": 1777924218350
 }
