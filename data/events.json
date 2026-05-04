@@ -119,7 +119,23 @@
       ],
       "date": "2026-06-28",
       "createdAt": 1777929088830
+    },
+    {
+      "id": "morp4i1qmy8s5m",
+      "status": "savedate",
+      "title": "Rei Lear - Cia Extermporânea",
+      "type": "teatro",
+      "time": "19:00",
+      "location": "Teatro Paulo Eiró",
+      "price": "Free",
+      "link": "",
+      "author": "Ju",
+      "suggestedDates": [
+        "2026-05-10"
+      ],
+      "date": "2026-05-10",
+      "createdAt": 1777929173342
     }
   ],
-  "updatedAt": 1777929089198
+  "updatedAt": 1777929173723
 }
