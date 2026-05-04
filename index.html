@@ -525,7 +525,7 @@ body {
 
 .day {
   min-height: 86px;
-  padding: 10px 8px 8px;
+  padding: 10px 4px 8px;
   border-right: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
   cursor: pointer;
@@ -533,7 +533,10 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+}
+.day .day-num {
+  align-self: center;
 }
 .day:nth-child(7n) { border-right: none; }
 .day:hover:not(.other-month) { background: #FFF8EE; }
@@ -570,44 +573,46 @@ body {
   color: var(--dark);
 }
 
-/* Bolinhas de tipo (em vez de pills cheios) */
-.day-dots {
+/* Barras de evento (uma por evento, na cor do tipo) */
+.day-bars {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 3px;
-  justify-content: center;
-  align-items: center;
-  max-width: 100%;
+  width: 100%;
+  padding: 0 4px;
+  margin-top: 2px;
 }
-.day-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.day-bar {
+  height: 5px;
+  border-radius: 3px;
+  width: 100%;
   flex-shrink: 0;
-  position: relative;
 }
-.day-dot.t-cinema  { background: var(--type-cinema); }
-.day-dot.t-teatro  { background: var(--type-teatro); }
-.day-dot.t-danca   { background: var(--type-danca); }
-.day-dot.t-musica  { background: var(--type-musica); }
-.day-dot.t-outro   { background: var(--type-outro); }
+.day-bar.t-cinema  { background: var(--type-cinema); }
+.day-bar.t-teatro  { background: var(--type-teatro); }
+.day-bar.t-danca   { background: var(--type-danca); }
+.day-bar.t-musica  { background: var(--type-musica); }
+.day-bar.t-outro   { background: var(--type-outro); }
 
-/* Save the date: bolinha vazada (anel) */
-.day-dot.savedate {
+/* Save the date: barra tracejada vazada */
+.day-bar.savedate {
   background: transparent;
-  border: 1.5px solid var(--type-teatro);
+  border: 1px dashed var(--type-teatro);
+  height: 5px;
+  background-image: none;
 }
-.day-dot.savedate.t-cinema  { border-color: var(--type-cinema); background: transparent; }
-.day-dot.savedate.t-teatro  { border-color: var(--type-teatro); background: transparent; }
-.day-dot.savedate.t-danca   { border-color: var(--type-danca); background: transparent; }
-.day-dot.savedate.t-musica  { border-color: var(--type-musica); background: transparent; }
-.day-dot.savedate.t-outro   { border-color: var(--type-outro); background: transparent; }
+.day-bar.savedate.t-cinema  { border-color: var(--type-cinema); }
+.day-bar.savedate.t-teatro  { border-color: var(--type-teatro); }
+.day-bar.savedate.t-danca   { border-color: var(--type-danca); }
+.day-bar.savedate.t-musica  { border-color: var(--type-musica); }
+.day-bar.savedate.t-outro   { border-color: var(--type-outro); }
 
 .day-count {
   font-size: 9px;
   color: var(--text-mute);
   font-weight: 600;
-  margin-left: 2px;
+  text-align: center;
+  margin-top: 2px;
 }
 
 /* ─────────── PAINEL LATERAL DE PRÓXIMOS EVENTOS ─────────── */
@@ -899,6 +904,13 @@ body {
   font-size: 10px;
   color: var(--text-mute);
   margin-top: 2px;
+}
+.list-event-dates-hint {
+  font-size: 10px;
+  color: var(--text-deep);
+  margin-top: 4px;
+  font-style: italic;
+  font-weight: 500;
 }
 .list-event-price {
   font-size: 12px;
@@ -1684,22 +1696,31 @@ function renderSidebar() {
   const contentEl  = document.getElementById('sidebar-content');
   if (!contentEl) return;
 
-  let occurrences = flattenEventOccurrences();
-  let listToShow;
+  // Calcula range de datas a considerar (mês atual ou seleção de dia)
+  let entries; // array de { event, primaryDate, allDatesInRange }
+  let isDayFiltered = false;
 
   if (state.selectedDay) {
-    // Filtrado: só ocorrências do dia selecionado
+    isDayFiltered = true;
     titleEl.textContent = 'Eventos do dia';
     const [yy, mm, dd] = state.selectedDay.split('-').map(Number);
     subtitleEl.textContent = `${dd} de ${MONTHS_PT[mm - 1]} de ${yy}`;
     clearEl.style.display = 'inline-block';
-    listToShow = occurrences.filter(o => o.date === state.selectedDay);
+
+    // No filtro de dia, mostra todos os eventos que tocam aquele dia (1 card por evento)
+    entries = state.events
+      .filter(passesFilters)
+      .filter(ev => eventDates(ev).includes(state.selectedDay))
+      .map(ev => ({
+        event: ev,
+        primaryDate: state.selectedDay,
+        allDatesInRange: eventDates(ev)
+      }));
   } else {
-    // Lista do mês visualizado (futuros a partir de hoje, se for mês atual)
+    // Range do mês visualizado (a partir de hoje se for mês atual)
     const today = todayKey();
     const monthStart = dateKey(state.currentYear, state.currentMonth, 1);
     const monthEnd = dateKey(state.currentYear, state.currentMonth, new Date(state.currentYear, state.currentMonth + 1, 0).getDate());
-    const isCurrentOrFutureMonth = monthEnd >= today;
     const startDate = monthStart < today ? today : monthStart;
 
     if (state.currentMonth === state.baseMonth && state.currentYear === state.baseYear) {
@@ -1711,26 +1732,55 @@ function renderSidebar() {
     }
     clearEl.style.display = 'none';
 
-    listToShow = occurrences
-      .filter(o => o.date >= startDate && o.date <= monthEnd)
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 15);
+    // 1 entrada por evento (nunca duplica). Para Save the Date com múltiplas datas,
+    // a "primaryDate" é a primeira data que cai no range, e "allDatesInRange" lista todas.
+    entries = [];
+    state.events.forEach(ev => {
+      if (!passesFilters(ev)) return;
+      const dates = eventDates(ev);
+      const datesInRange = dates.filter(d => d >= startDate && d <= monthEnd);
+      if (datesInRange.length === 0) return;
+      datesInRange.sort();
+      entries.push({
+        event: ev,
+        primaryDate: datesInRange[0],
+        allDatesInRange: datesInRange
+      });
+    });
+    // Ordena por primeira data
+    entries.sort((a, b) => a.primaryDate.localeCompare(b.primaryDate));
+    entries = entries.slice(0, 15);
   }
 
-  if (listToShow.length === 0) {
-    contentEl.innerHTML = `<div class="sidebar-empty">${state.selectedDay ? 'Nenhum evento neste dia.' : 'Nenhum evento neste mês.'}</div>`;
+  if (entries.length === 0) {
+    contentEl.innerHTML = `<div class="sidebar-empty">${isDayFiltered ? 'Nenhum evento neste dia.' : 'Nenhum evento neste mês.'}</div>`;
     return;
   }
 
   contentEl.innerHTML = '';
-  listToShow.forEach(occ => {
-    const ev = occ.event;
+  entries.forEach(entry => {
+    const ev = entry.event;
     const isSavedate = ev.status === 'savedate';
     const card = document.createElement('div');
     card.className = `sidebar-event ${isSavedate ? 'savedate' : ''}`;
 
-    const [yy, mm, dd] = occ.date.split('-').map(Number);
-    const dateLabel = `${dd} ${MONTHS_PT[mm - 1].slice(0, 3).toUpperCase()}${ev.time ? ' · ' + ev.time : ''}`;
+    // Label de data: depende se é Save the Date com múltiplas opções ou não
+    let dateLabel;
+    const allDates = eventDates(ev);
+
+    if (isSavedate && allDates.length > 1) {
+      // Save the Date com múltiplas sugestões: lista todas as datas
+      const formatted = allDates.map(d => {
+        const [, mm, dd] = d.split('-').map(Number);
+        return `${dd} ${MONTHS_PT[mm - 1].slice(0, 3).toLowerCase()}`;
+      }).join(' · ');
+      dateLabel = `${allDates.length} datas: ${formatted}${ev.time ? ' · ' + ev.time : ''}`;
+    } else {
+      // Caso normal: 1 data
+      const [, mm, dd] = entry.primaryDate.split('-').map(Number);
+      dateLabel = `${dd} ${MONTHS_PT[mm - 1].slice(0, 3).toUpperCase()}${ev.time ? ' · ' + ev.time : ''}`;
+    }
+
     const statusLabel = isSavedate ? 'Save the Date' : 'Confirmado';
     const statusClass = isSavedate ? 'savedate' : 'confirmed';
 
@@ -1746,7 +1796,8 @@ function renderSidebar() {
         ${typeName(ev.type)}${ev.author ? ' · ' + escapeHtml(ev.author) : ''}${ev.price ? ' · ' + escapeHtml(ev.price) : ''}
       </div>
     `;
-    card.onclick = () => openDayDetail(occ.date);
+    // Click no card abre o detalhe na primeira data relevante do range
+    card.onclick = () => openDayDetail(entry.primaryDate);
     contentEl.appendChild(card);
   });
 }
@@ -1817,23 +1868,23 @@ function renderCalendar() {
       }
 
       if (dayEvents.length > 0) {
-        const dotsContainer = document.createElement('div');
-        dotsContainer.className = 'day-dots';
-        const maxDots = 5;
-        dayEvents.slice(0, maxDots).forEach(ev => {
-          const dot = document.createElement('span');
+        const barsContainer = document.createElement('div');
+        barsContainer.className = 'day-bars';
+        const maxBars = 4;
+        dayEvents.slice(0, maxBars).forEach(ev => {
+          const bar = document.createElement('div');
           const statusClass = ev.status === 'savedate' ? 'savedate' : '';
-          dot.className = `day-dot ${statusClass} t-${ev.type}`;
-          dot.title = ev.title;
-          dotsContainer.appendChild(dot);
+          bar.className = `day-bar ${statusClass} t-${ev.type}`;
+          bar.title = ev.title + (ev.time ? ' · ' + ev.time : '');
+          barsContainer.appendChild(bar);
         });
-        if (dayEvents.length > maxDots) {
-          const count = document.createElement('span');
+        if (dayEvents.length > maxBars) {
+          const count = document.createElement('div');
           count.className = 'day-count';
-          count.textContent = `+${dayEvents.length - maxDots}`;
-          dotsContainer.appendChild(count);
+          count.textContent = `+${dayEvents.length - maxBars}`;
+          barsContainer.appendChild(count);
         }
-        dayCell.appendChild(dotsContainer);
+        dayCell.appendChild(barsContainer);
       }
 
       // Click no dia: filtra o sidebar (não abre modal direto na grade compacta)
@@ -1866,13 +1917,25 @@ function renderListView() {
   const container = document.getElementById('list-view');
   container.innerHTML = '';
 
-  // Coletar dias do mês que têm eventos (filtra dias vazios)
+  // Identifica quais Save the Dates já foram "alocados" a um dia (evita duplicar)
+  const savedateAllocated = new Set();
+
+  // Coletar dias do mês que têm eventos (e filtrar duplicação de save the date)
   const daysWithEvents = [];
   for (let d = 1; d <= lastDay; d++) {
     const key = dateKey(y, m, d);
     const dayEvents = eventsOnDate(key);
-    if (dayEvents.length > 0) {
-      daysWithEvents.push({ d, key, dayEvents });
+
+    // Filtra Save the Dates que já foram exibidos em dia anterior do mesmo mês
+    const filteredEvents = dayEvents.filter(ev => {
+      if (ev.status !== 'savedate') return true;
+      if (savedateAllocated.has(ev.id)) return false;
+      savedateAllocated.add(ev.id);
+      return true;
+    });
+
+    if (filteredEvents.length > 0) {
+      daysWithEvents.push({ d, key, dayEvents: filteredEvents });
     }
   }
 
@@ -1912,6 +1975,20 @@ function renderListView() {
       const statusClass = ev.status === 'savedate' ? 'savedate' : 'confirmed';
       evEl.className = `list-event ${statusClass} t-${ev.type}`;
       const statusLabel = ev.status === 'savedate' ? 'Save the Date' : 'Confirmado';
+
+      // Para Save the Date com múltiplas datas, indica as outras datas no meta
+      let datesHint = '';
+      if (ev.status === 'savedate') {
+        const allDates = eventDates(ev);
+        if (allDates.length > 1) {
+          const formatted = allDates.map(dt => {
+            const [, mm, dd] = dt.split('-').map(Number);
+            return `${dd} ${MONTHS_PT[mm - 1].slice(0, 3).toLowerCase()}`;
+          }).join(' · ');
+          datesHint = `<div class="list-event-dates-hint">📅 ${allDates.length} datas sugeridas: ${formatted}</div>`;
+        }
+      }
+
       evEl.innerHTML = `
         <div class="list-event-info">
           <div class="list-event-status-row">
@@ -1919,6 +1996,7 @@ function renderListView() {
             <span class="list-event-title">${escapeHtml(ev.title)}</span>
           </div>
           <div class="list-event-meta">${ev.time ? ev.time + ' · ' : ''}${ev.location ? escapeHtml(ev.location) + ' · ' : ''}${typeName(ev.type)}${ev.author ? ' · por ' + escapeHtml(ev.author) : ''}</div>
+          ${datesHint}
         </div>
         ${ev.price ? `<div class="list-event-price">${escapeHtml(ev.price)}</div>` : ''}
       `;
