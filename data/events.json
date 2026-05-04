@@ -62,12 +62,12 @@
       "link": "A confirmar",
       "author": "Ju",
       "suggestedDates": [
-        "2026-05-22",
-        "2026-05-23"
+        "2026-05-23",
+        "2026-05-24"
       ],
-      "date": "2026-05-22",
+      "date": "2026-05-23",
       "createdAt": 1777924370578,
-      "updatedAt": 1777928091987
+      "updatedAt": 1777928110092
     },
     {
       "id": "mormd5k68vfqbb",
@@ -84,5 +84,5 @@
       "createdAt": 1777924538214
     }
   ],
-  "updatedAt": 1777928092352
+  "updatedAt": 1777928110468
 }
