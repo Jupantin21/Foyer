@@ -85,20 +85,6 @@
       "createdAt": 1777924538214
     },
     {
-      "id": "morowe8cptg818",
-      "status": "confirmado",
-      "title": "Amaro Freitas - Alaíde Costa",
-      "type": "musica",
-      "time": "20:00",
-      "location": "Sesc 14 Bis",
-      "price": "Compra a partir de 15/5 - 14h",
-      "link": "https://www.sescsp.org.br/programacao/amaro-freitas-trio-6/",
-      "author": "Ju",
-      "date": "2026-05-16",
-      "suggestedDates": [],
-      "createdAt": 1777928795148
-    },
-    {
       "id": "moroy5p3aqxdb1",
       "status": "savedate",
       "title": "Amaro Freitas Trio",
@@ -117,5 +103,5 @@
       "updatedAt": 1777928889926
     }
   ],
-  "updatedAt": 1777928890312
+  "updatedAt": 1777928940559
 }
