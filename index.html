@@ -126,24 +126,23 @@ body {
 .btn-icon:hover { background: var(--cream); }
 .btn-icon:disabled { opacity: 0.35; cursor: not-allowed; }
 
-/* ─────────── ABAS DE VIEW (Calendário / Wishlist) ─────────── */
-.view-tabs {
-  max-width: 1200px;
-  margin: 0 auto 16px;
-  display: flex;
-  gap: 4px;
-  padding: 4px;
+/* ─────────── TOOLBAR DO MÊS (status filtro + view toggle + nav) ─────────── */
+
+/* Status filtro: Todos / Confirmados / Save the Date */
+.status-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  width: fit-content;
+  border-radius: 10px;
 }
-.view-tab {
+.status-btn {
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  padding: 8px 18px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 7px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -151,32 +150,68 @@ body {
   transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  white-space: nowrap;
 }
-.view-tab:hover { background: var(--cream); }
-.view-tab.active {
+.status-btn:hover { background: var(--cream); }
+.status-btn.active {
   background: var(--orange);
   color: #FFF;
 }
-.view-tab .count {
-  font-size: 11px;
+.status-btn .count {
+  font-size: 10px;
   background: rgba(0,0,0,0.12);
-  padding: 1px 7px;
-  border-radius: 10px;
+  padding: 1px 6px;
+  border-radius: 9px;
   font-weight: 700;
 }
-.view-tab.active .count {
+.status-btn.active .count {
   background: rgba(255,255,255,0.25);
 }
 
-/* ─────────── WISHLIST VIEW ─────────── */
-.wishlist-view {
-  display: none;
-  max-width: 1200px;
-  margin: 0 auto;
+/* Toggle de visualização: ⊞ Calendário / ☰ Lista */
+.view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  gap: 2px;
 }
-.wishlist-view.show { display: block; }
+.view-btn {
+  font-family: inherit;
+  font-size: 16px;
+  padding: 5px 11px;
+  border-radius: 7px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-mute);
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+.view-btn:hover { background: var(--cream); color: var(--orange); }
+.view-btn.active {
+  background: var(--orange);
+  color: #FFF;
+}
 
+/* Layout da toolbar */
+.month-nav-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.month-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ─────────── WISHLIST CARDS (estilos legados, ainda usados pelos modais) ─────────── */
 .wishlist-empty {
   background: var(--bg-soft);
   border: 1px dashed var(--border);
@@ -419,14 +454,15 @@ body {
   vertical-align: middle;
 }
 
-/* ─────────── MONTH NAV ─────────── */
+/* ─────────── MONTH NAV / TOOLBAR ─────────── */
 .month-nav {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
 }
 .month-title {
   font-size: 26px;
@@ -1100,20 +1136,36 @@ body {
   }
 }
 
-/* Mobile (<768px): mesma lista, mais compacta */
+/* Mobile (<768px): toolbar mais compacta, esconde toggle calendário/lista (mobile sempre lista) */
 @media (max-width: 767px) {
   body { padding: 16px 12px 60px; }
   .month-title { font-size: 22px; }
   .filters { padding: 10px 12px; gap: 6px; }
   .filter-chip { padding: 5px 10px; font-size: 11px; }
-  .view-tabs { width: 100%; }
-  .view-tab { flex: 1; justify-content: center; }
   .list-view { max-width: 100%; }
+
+  .month-nav { gap: 10px; }
+  .month-toolbar {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .view-toggle { display: none; }
+  .status-toggle { flex: 1; min-width: 0; overflow-x: auto; }
+  .status-btn { padding: 6px 10px; font-size: 11px; }
 }
 
-/* Desktop (≥1024px): híbrido grade + sidebar */
+/* Desktop (≥1024px): híbrido grade + sidebar (default) ou lista (toggle ☰) */
 @media (min-width: 1024px) {
   .list-view { display: none; }
+
+  /* Quando usuário troca para visão Lista no desktop, esconde grade+sidebar */
+  .calendar-layout.hide-on-desktop { display: none; }
+  .list-view.show-on-desktop {
+    display: block;
+    max-width: 880px;
+    margin: 0 auto;
+  }
 }
 </style>
 </head>
@@ -1153,27 +1205,29 @@ body {
   <button class="filter-chip" data-filter="outro"><span class="filter-dot" style="background:#8C7B6B"></span>Outro</button>
 </div>
 
-<!-- ═══════════ ABAS DE VIEW ═══════════ -->
-<div class="view-tabs">
-  <button class="view-tab active" data-view="calendar">
-    Calendário
-    <span class="count" id="count-confirmed">0</span>
-  </button>
-  <button class="view-tab" data-view="wishlist">
-    Save the Date
-    <span class="count" id="count-wishlist">0</span>
-  </button>
-</div>
-
-<!-- ═══════════ NAVEGAÇÃO DO MÊS ═══════════ -->
+<!-- ═══════════ TOOLBAR DO MÊS (título + filtro de status + toggle de view) ═══════════ -->
 <div class="month-nav" id="month-nav-wrap">
-  <div>
+  <div class="month-nav-left">
     <span class="month-title" id="month-title">—</span>
     <span class="month-counter" id="month-counter"></span>
   </div>
-  <div class="month-nav-controls">
-    <button class="btn-icon" id="btn-prev" aria-label="Mês anterior">‹</button>
-    <button class="btn-icon" id="btn-next" aria-label="Próximo mês">›</button>
+  <div class="month-toolbar">
+    <!-- Filtro de status -->
+    <div class="status-toggle" role="group" aria-label="Filtro de status">
+      <button class="status-btn active" data-status="all">Todos <span class="count" id="count-all">0</span></button>
+      <button class="status-btn" data-status="confirmado">Confirmados <span class="count" id="count-confirmed">0</span></button>
+      <button class="status-btn" data-status="savedate">Save the Date <span class="count" id="count-wishlist">0</span></button>
+    </div>
+    <!-- Toggle de visualização (calendário ou lista) -->
+    <div class="view-toggle" role="group" aria-label="Visualização">
+      <button class="view-btn active" data-view="calendar" title="Calendário">⊞</button>
+      <button class="view-btn" data-view="list" title="Lista">☰</button>
+    </div>
+    <!-- Navegação de mês -->
+    <div class="month-nav-controls">
+      <button class="btn-icon" id="btn-prev" aria-label="Mês anterior">‹</button>
+      <button class="btn-icon" id="btn-next" aria-label="Próximo mês">›</button>
+    </div>
   </div>
 </div>
 
@@ -1203,11 +1257,8 @@ body {
   </aside>
 </div>
 
-<!-- ═══════════ LISTA (MOBILE) ═══════════ -->
+<!-- ═══════════ LISTA (MOBILE / VISÃO LISTA) ═══════════ -->
 <div class="list-view" id="list-view"></div>
-
-<!-- ═══════════ WISHLIST VIEW ═══════════ -->
-<div class="wishlist-view" id="wishlist-view"></div>
 
 <!-- ═══════════ MODAL — CRIAR/EDITAR EVENTO ═══════════ -->
 <div class="modal-backdrop" id="modal-form">
@@ -1336,7 +1387,9 @@ const state = {
   currentYear:  new Date().getFullYear(),
   baseMonth:    new Date().getMonth(),
   baseYear:     new Date().getFullYear(),
-  filter:       'all',
+  filter:       'all',     // filtro de TIPO (cinema, teatro, etc.)
+  statusFilter: 'all',     // filtro de STATUS (all, confirmado, savedate)
+  viewMode:     'calendar', // visualização: 'calendar' ou 'list'
   events:       [],
   editingId:    null,
   syncing:      false,
@@ -1542,11 +1595,21 @@ function eventDates(ev) {
   return ev.date ? [ev.date] : [];
 }
 
-// Eventos do dia (com filtro) — confirmados E save the date aparecem
+// Helper: aplica filtros (tipo + status) a um evento
+function passesFilters(ev) {
+  // Filtro de tipo
+  if (state.filter !== 'all' && ev.type !== state.filter) return false;
+  // Filtro de status
+  if (state.statusFilter === 'confirmado' && ev.status === 'savedate') return false;
+  if (state.statusFilter === 'savedate' && ev.status !== 'savedate') return false;
+  return true;
+}
+
+// Eventos do dia (com filtros aplicados) — confirmados E save the date aparecem
 function eventsOnDate(key) {
   return state.events
     .filter(e => eventDates(e).includes(key))
-    .filter(e => state.filter === 'all' || e.type === state.filter)
+    .filter(passesFilters)
     .sort((a, b) => {
       // Confirmados primeiro, depois save the dates
       const sa = a.status === 'savedate' ? 1 : 0;
@@ -1556,7 +1619,7 @@ function eventsOnDate(key) {
     });
 }
 
-// Eventos da wishlist (status === 'savedate') — para a aba Save the Date
+// Eventos da wishlist (status === 'savedate') — para uso interno de contagem
 function wishlistEvents() {
   return state.events
     .filter(e => e.status === 'savedate')
@@ -1564,9 +1627,20 @@ function wishlistEvents() {
     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 }
 
-// Conta eventos confirmados
+// Contadores (respeitando filtro de tipo, mas não de status)
 function confirmedCount() {
-  return state.events.filter(e => e.status !== 'savedate').length;
+  return state.events
+    .filter(e => state.filter === 'all' || e.type === state.filter)
+    .filter(e => e.status !== 'savedate').length;
+}
+function savedateCount() {
+  return state.events
+    .filter(e => state.filter === 'all' || e.type === state.filter)
+    .filter(e => e.status === 'savedate').length;
+}
+function totalCount() {
+  return state.events
+    .filter(e => state.filter === 'all' || e.type === state.filter).length;
 }
 
 // ─────────── SELEÇÃO DE DIA + SIDEBAR ───────────
@@ -1586,11 +1660,11 @@ function clearDaySelection() {
 }
 
 // Retorna lista plana de "ocorrências" — cada save the date com 3 datas vira 3 ocorrências.
-// Cada ocorrência tem { event, date }. Filtros aplicados.
+// Cada ocorrência tem { event, date }. Filtros aplicados (tipo + status).
 function flattenEventOccurrences() {
   const out = [];
   state.events.forEach(ev => {
-    if (state.filter !== 'all' && ev.type !== state.filter) return;
+    if (!passesFilters(ev)) return;
     const dates = eventDates(ev);
     if (dates.length === 0) {
       // Save the date sem nenhuma data sugerida não aparece no sidebar
@@ -1621,19 +1695,30 @@ function renderSidebar() {
     clearEl.style.display = 'inline-block';
     listToShow = occurrences.filter(o => o.date === state.selectedDay);
   } else {
-    // Próximos eventos a partir de hoje
-    titleEl.textContent = 'Próximos eventos';
-    subtitleEl.textContent = 'a partir de hoje';
-    clearEl.style.display = 'none';
+    // Lista do mês visualizado (futuros a partir de hoje, se for mês atual)
     const today = todayKey();
+    const monthStart = dateKey(state.currentYear, state.currentMonth, 1);
+    const monthEnd = dateKey(state.currentYear, state.currentMonth, new Date(state.currentYear, state.currentMonth + 1, 0).getDate());
+    const isCurrentOrFutureMonth = monthEnd >= today;
+    const startDate = monthStart < today ? today : monthStart;
+
+    if (state.currentMonth === state.baseMonth && state.currentYear === state.baseYear) {
+      titleEl.textContent = 'Próximos eventos';
+      subtitleEl.textContent = 'a partir de hoje';
+    } else {
+      titleEl.textContent = `Eventos em ${MONTHS_PT[state.currentMonth]}`;
+      subtitleEl.textContent = `${MONTHS_PT[state.currentMonth]} ${state.currentYear}`;
+    }
+    clearEl.style.display = 'none';
+
     listToShow = occurrences
-      .filter(o => o.date >= today)
+      .filter(o => o.date >= startDate && o.date <= monthEnd)
       .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 12);
+      .slice(0, 15);
   }
 
   if (listToShow.length === 0) {
-    contentEl.innerHTML = `<div class="sidebar-empty">${state.selectedDay ? 'Nenhum evento neste dia.' : 'Nenhum evento futuro ainda.'}</div>`;
+    contentEl.innerHTML = `<div class="sidebar-empty">${state.selectedDay ? 'Nenhum evento neste dia.' : 'Nenhum evento neste mês.'}</div>`;
     return;
   }
 
@@ -1760,12 +1845,17 @@ function renderCalendar() {
 
   renderListView();
   renderSidebar();
+  updateStatusCounts();
+}
 
-  // Atualiza contadores das abas
+// Atualiza os contadores dos botões de filtro de status
+function updateStatusCounts() {
+  const cAll = document.getElementById('count-all');
   const cConfirmed = document.getElementById('count-confirmed');
   const cWishlist  = document.getElementById('count-wishlist');
+  if (cAll)       cAll.textContent       = totalCount();
   if (cConfirmed) cConfirmed.textContent = confirmedCount();
-  if (cWishlist)  cWishlist.textContent  = state.events.filter(e => e.status === 'savedate').length;
+  if (cWishlist)  cWishlist.textContent  = savedateCount();
 }
 
 // ─────────── RENDER: LIST (MOBILE) ───────────
@@ -2049,12 +2139,11 @@ async function saveEvent() {
       state.currentYear = y;
       state.currentMonth = m - 1;
     }
-    // Se foi criado um save the date, leva para a aba wishlist
+    // Se foi criado um save the date, ativa o filtro Save the Date
     if (status === 'savedate' && !state.editingId) {
-      switchView('wishlist');
+      switchStatus('savedate');
     } else {
       renderCalendar();
-      if (state.currentView === 'wishlist') renderWishlist();
     }
   }
 }
@@ -2110,96 +2199,43 @@ document.querySelectorAll('.filter-chip').forEach(chip => {
   };
 });
 
-// ─────────── VIEW SWITCHING (Calendário / Wishlist) ───────────
-state.currentView = 'calendar';
-
-function switchView(view) {
-  state.currentView = view;
-  document.querySelectorAll('.view-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.view === view);
+// ─────────── FILTRO DE STATUS (Todos / Confirmados / Save the Date) ───────────
+function switchStatus(status) {
+  state.statusFilter = status;
+  document.querySelectorAll('.status-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.status === status);
   });
-
-  const calendar     = document.getElementById('calendar');
-  const listView     = document.getElementById('list-view');
-  const wishlistView = document.getElementById('wishlist-view');
-  const monthNav     = document.getElementById('month-nav-wrap');
-
-  if (view === 'calendar') {
-    monthNav.style.display = '';
-    // calendar e list-view voltam ao normal (CSS controla via media query)
-    calendar.style.display = '';
-    listView.style.display = '';
-    wishlistView.classList.remove('show');
-  } else {
-    monthNav.style.display = 'none';
-    calendar.style.display = 'none';
-    listView.style.display = 'none';
-    wishlistView.classList.add('show');
-    renderWishlist();
-  }
+  state.selectedDay = null; // limpa seleção ao trocar filtro
+  renderCalendar();
 }
-
-document.querySelectorAll('.view-tab').forEach(tab => {
-  tab.onclick = () => switchView(tab.dataset.view);
+document.querySelectorAll('.status-btn').forEach(btn => {
+  btn.onclick = () => switchStatus(btn.dataset.status);
 });
 
-// ─────────── RENDER WISHLIST ───────────
-function renderWishlist() {
-  const wishes = wishlistEvents();
-  const container = document.getElementById('wishlist-view');
-
-  if (wishes.length === 0) {
-    container.innerHTML = `
-      <div class="wishlist-empty">
-        <div class="wishlist-empty-title">Sua wishlist está vazia</div>
-        <div class="wishlist-empty-sub">
-          Crie um evento marcando "Save the Date" quando ainda não souber o dia certo.
-          Ele aparece aqui para o grupo discutir antes de virar evento confirmado.
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = '';
-  const grid = document.createElement('div');
-  grid.className = 'wishlist-grid';
-
-  wishes.forEach(ev => {
-    const card = document.createElement('div');
-    card.className = `wishlist-card t-${ev.type}`;
-    const dates = eventDates(ev);
-    let datesHtml;
-    if (dates.length === 0) {
-      datesHtml = '<div><em>Data ainda indefinida</em></div>';
-    } else if (dates.length === 1) {
-      datesHtml = `<div>📅 ${formatDateBR(dates[0])}${ev.time ? ' · ' + ev.time : ''}</div>`;
-    } else {
-      const dateList = dates.map(d => formatDateBR(d)).join(' · ');
-      datesHtml = `<div>📅 <strong>${dates.length} sugestões:</strong></div><div style="margin-top:2px;">${dateList}</div>`;
-    }
-    card.innerHTML = `
-      <div class="wishlist-card-top">
-        <div class="wishlist-card-title">${escapeHtml(ev.title)}</div>
-        <div class="wishlist-card-type t-${ev.type}">${typeName(ev.type)}</div>
-      </div>
-      <div class="wishlist-card-meta">
-        ${datesHtml}
-        ${ev.location ? `<div>📍 ${escapeHtml(ev.location)}</div>` : ''}
-        ${ev.author ? `<div>Adicionado por <strong>${escapeHtml(ev.author)}</strong></div>` : ''}
-      </div>
-      ${ev.price ? `<div class="wishlist-card-price">${escapeHtml(ev.price)}</div>` : ''}
-    `;
-    card.onclick = () => openWishlistDetail(ev);
-    grid.appendChild(card);
+// ─────────── TOGGLE DE VISUALIZAÇÃO (Calendário / Lista) ───────────
+function switchViewMode(mode) {
+  state.viewMode = mode;
+  document.querySelectorAll('.view-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === mode);
   });
 
-  container.appendChild(grid);
+  // No desktop (≥1024px), respeita o toggle escolhido pelo usuário.
+  // No tablet/mobile, o CSS já força lista (regras @media).
+  const calendarLayout = document.getElementById('calendar-layout');
+  const listView = document.getElementById('list-view');
 
-  // Update counters
-  document.getElementById('count-confirmed').textContent = confirmedCount();
-  document.getElementById('count-wishlist').textContent = wishes.length;
+  if (mode === 'list') {
+    calendarLayout.classList.add('hide-on-desktop');
+    listView.classList.add('show-on-desktop');
+  } else {
+    calendarLayout.classList.remove('hide-on-desktop');
+    listView.classList.remove('show-on-desktop');
+  }
+  renderCalendar();
 }
+document.querySelectorAll('.view-btn').forEach(btn => {
+  btn.onclick = () => switchViewMode(btn.dataset.view);
+});
 
 function openWishlistDetail(ev) {
   // Reusa o modal de detalhes do dia para mostrar o item
