@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foyer · Agenda Cultural</title>
+<style>
+:root {
+  --orange: #CC5500;
+  --orange-mid: #FF8C00;
+  --amber: #FFB347;
+  --cream: #FFF0DC;
+  --paper: #FFFFFF;        /* fundo do app: branco puro */
+  --bg: #FFFDF9;           /* superfícies elevadas (cards) */
+  --bg-soft: #FFFAF2;      /* superfícies sutilmente diferenciadas */
+  --dark: #1A0A00;
+  --text-mute: #B07040;
+  --text-deep: #7A4010;
+  --border: #E8D5B7;       /* mais sutil sobre branco */
+  --border-soft: #F5E5CC;
+  --today: #FFE8CC;
+
+  --type-cinema: #5B8DEF;
+  --type-teatro: #CC5500;
+  --type-danca: #C44D8A;
+  --type-musica: #6B9D6F;
+  --type-outro: #8C7B6B;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: var(--paper);
+  color: var(--dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  padding: 32px 24px 80px;
+}
+
+/* ─────────── HEADER ─────────── */
+.app-header {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+.brand-text { line-height: 1; }
+.brand-name {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -1.2px;
+  color: var(--orange);
+}
+.brand-tag {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-top: 4px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.2px;
+}
+.btn-primary {
+  background: var(--orange);
+  color: #FFF;
+}
+.btn-primary:hover { background: #B34800; }
+
+.btn-ghost {
+  background: var(--bg);
+  color: var(--dark);
+  border-color: var(--border);
+}
+.btn-ghost:hover { background: var(--cream); }
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--dark);
+  transition: all 0.15s ease;
+}
+.btn-icon:hover { background: var(--cream); }
+.btn-icon:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ─────────── ABAS DE VIEW (Calendário / Wishlist) ─────────── */
+.view-tabs {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: fit-content;
+}
+.view-tab {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-deep);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.view-tab:hover { background: var(--cream); }
+.view-tab.active {
+  background: var(--orange);
+  color: #FFF;
+}
+.view-tab .count {
+  font-size: 11px;
+  background: rgba(0,0,0,0.12);
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+.view-tab.active .count {
+  background: rgba(255,255,255,0.25);
+}
+
+/* ─────────── WISHLIST VIEW ─────────── */
+.wishlist-view {
+  display: none;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.wishlist-view.show { display: block; }
+
+.wishlist-empty {
+  background: var(--bg-soft);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-mute);
+}
+.wishlist-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+.wishlist-empty-sub {
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.wishlist-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--amber);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 3px rgba(26,10,0,0.04);
+}
+.wishlist-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(26,10,0,0.08);
+}
+.wishlist-card.t-cinema  { border-left-color: var(--type-cinema); }
+.wishlist-card.t-teatro  { border-left-color: var(--type-teatro); }
+.wishlist-card.t-danca   { border-left-color: var(--type-danca); }
+.wishlist-card.t-musica  { border-left-color: var(--type-musica); }
+.wishlist-card.t-outro   { border-left-color: var(--type-outro); }
+
+.wishlist-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.wishlist-card-type {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #FFF;
+  background: var(--orange);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.wishlist-card-type.t-cinema  { background: var(--type-cinema); }
+.wishlist-card-type.t-teatro  { background: var(--type-teatro); }
+.wishlist-card-type.t-danca   { background: var(--type-danca); }
+.wishlist-card-type.t-musica  { background: var(--type-musica); }
+.wishlist-card-type.t-outro   { background: var(--type-outro); }
+.wishlist-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--dark);
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+.wishlist-card-meta {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.wishlist-card-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--orange);
+  margin-top: 6px;
+}
+
+/* ─────────── STATUS BADGE NO EVENTO ─────────── */
+.status-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.status-badge.confirmado {
+  background: var(--type-musica);
+  color: #FFF;
+}
+.status-badge.savedate {
+  background: var(--amber);
+  color: var(--dark);
+}
+
+/* Pill de save the date no calendário (estilo distinto) */
+.event-pill.savedate {
+  font-style: italic;
+  background: var(--paper);
+  border-left-style: dashed;
+}
+
+/* ─────────── SYNC INDICATOR ─────────── */
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--text-mute);
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.sync-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #999;
+  flex-shrink: 0;
+}
+.sync-dot.ok      { background: #6B9D6F; }
+.sync-dot.syncing { background: var(--orange-mid); animation: pulse 1.2s ease-in-out infinite; }
+.sync-dot.error   { background: #C44D4D; }
+.sync-dot.offline { background: #8C7B6B; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(1.25); }
+}
+
+/* ─────────── SETUP MODAL ─────────── */
+.setup-help {
+  font-size: 12px;
+  color: var(--text-deep);
+  background: var(--cream);
+  border-left: 3px solid var(--orange);
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.setup-help code {
+  background: #FFF;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: var(--orange);
+}
+.setup-help a {
+  color: var(--orange);
+  font-weight: 700;
+  text-decoration: none;
+}
+.setup-help a:hover { text-decoration: underline; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--dark);
+  color: #FFF;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 200;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast.error { background: #B33; }
+
+/* ─────────── FILTROS ─────────── */
+.filters {
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.filter-label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 600;
+  margin-right: 8px;
+}
+.filter-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-deep);
+  transition: all 0.15s ease;
+}
+.filter-chip:hover {
+  background: var(--cream);
+}
+.filter-chip.active {
+  background: var(--dark);
+  border-color: var(--dark);
+  color: #FFF;
+}
+
+.filter-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ─────────── MONTH NAV ─────────── */
+.month-nav {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.month-title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--dark);
+  text-transform: capitalize;
+}
+.month-counter {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-left: 12px;
+  font-weight: 500;
+}
+.month-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─────────── CALENDÁRIO GRID (DESKTOP) ─────────── */
+.calendar {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(26,10,0,0.04);
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+}
+.weekday {
+  padding: 12px 8px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 700;
+  text-align: center;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.day {
+  min-height: 110px;
+  padding: 8px;
+  border-right: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: background 0.12s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.day:nth-child(7n) { border-right: none; }
+.day:hover { background: #FFF8EE; }
+
+.day.other-month {
+  background: #FAF5EC;
+  cursor: default;
+}
+.day.other-month:hover { background: #FAF5EC; }
+.day.other-month .day-num { color: #C8B89A; }
+
+.day.today {
+  background: var(--today);
+}
+.day.today .day-num {
+  background: var(--orange);
+  color: #FFF;
+}
+
+.day-num {
+  font-size: 13px;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: 4px;
+  color: var(--dark);
+}
+
+.event-pill {
+  font-size: 10.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--cream);
+  border-left: 3px solid var(--orange);
+  color: var(--text-deep);
+  font-weight: 600;
+  transition: opacity 0.15s ease;
+}
+.event-pill:hover { opacity: 0.8; }
+.event-pill.t-cinema  { border-left-color: var(--type-cinema); }
+.event-pill.t-teatro  { border-left-color: var(--type-teatro); }
+.event-pill.t-danca   { border-left-color: var(--type-danca); }
+.event-pill.t-musica  { border-left-color: var(--type-musica); }
+.event-pill.t-outro   { border-left-color: var(--type-outro); }
+
+.event-more {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-mute);
+  padding: 1px 6px;
+  cursor: pointer;
+}
+.event-more:hover { color: var(--orange); }
+
+/* ─────────── LIST VIEW (MOBILE) ─────────── */
+.list-view { display: none; max-width: 720px; margin: 0 auto; }
+
+.list-day {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(26,10,0,0.04);
+}
+.list-day.today { border-color: var(--orange); border-width: 1.5px; }
+
+.list-day-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cream);
+}
+.list-day.today .list-day-header { background: var(--today); }
+.list-day-date {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.list-day-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--dark);
+  letter-spacing: -0.5px;
+}
+.list-day-name {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 600;
+}
+.list-day-add {
+  font-size: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--orange);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-events { padding: 8px 12px 12px; }
+.list-event {
+  padding: 10px 12px;
+  margin: 4px 0;
+  border-radius: 8px;
+  background: var(--paper);
+  border-left: 3px solid var(--orange);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.list-event.t-cinema  { border-left-color: var(--type-cinema); }
+.list-event.t-teatro  { border-left-color: var(--type-teatro); }
+.list-event.t-danca   { border-left-color: var(--type-danca); }
+.list-event.t-musica  { border-left-color: var(--type-musica); }
+.list-event.t-outro   { border-left-color: var(--type-outro); }
+
+.list-event-info { flex: 1; min-width: 0; }
+.list-event-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-event-meta {
+  font-size: 10px;
+  color: var(--text-mute);
+  margin-top: 2px;
+}
+.list-event-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--orange);
+  flex-shrink: 0;
+}
+
+.list-empty {
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-mute);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ─────────── MODAL ─────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 10, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+  backdrop-filter: blur(2px);
+}
+.modal-backdrop.show { display: flex; }
+
+.modal {
+  background: var(--bg);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(26, 10, 0, 0.25);
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--dark);
+}
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--text-mute);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.modal-close:hover { background: var(--cream); color: var(--dark); }
+
+.modal-body { padding: 20px 24px; }
+
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+}
+.form-input, .form-select {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #FFF;
+  color: var(--dark);
+  transition: border-color 0.15s ease;
+}
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--orange);
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.modal-footer {
+  padding: 16px 24px 24px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-soft);
+}
+
+/* DAY DETAIL MODAL */
+.day-detail-events { padding: 4px 0; }
+.detail-event {
+  padding: 14px;
+  margin-bottom: 8px;
+  background: var(--paper);
+  border-radius: 10px;
+  border-left: 4px solid var(--orange);
+}
+.detail-event.t-cinema  { border-left-color: var(--type-cinema); }
+.detail-event.t-teatro  { border-left-color: var(--type-teatro); }
+.detail-event.t-danca   { border-left-color: var(--type-danca); }
+.detail-event.t-musica  { border-left-color: var(--type-musica); }
+.detail-event.t-outro   { border-left-color: var(--type-outro); }
+
+.detail-event-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.detail-event-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dark);
+  letter-spacing: -0.2px;
+}
+.detail-event-type {
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #FFF;
+  background: var(--orange);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.detail-event-type.t-cinema  { background: var(--type-cinema); }
+.detail-event-type.t-teatro  { background: var(--type-teatro); }
+.detail-event-type.t-danca   { background: var(--type-danca); }
+.detail-event-type.t-musica  { background: var(--type-musica); }
+.detail-event-type.t-outro   { background: var(--type-outro); }
+
+.detail-event-row {
+  font-size: 12px;
+  color: var(--text-deep);
+  margin-bottom: 3px;
+  display: flex;
+  gap: 6px;
+}
+.detail-event-row .lbl {
+  color: var(--text-mute);
+  font-weight: 600;
+  min-width: 64px;
+}
+.detail-event-row a { color: var(--orange); text-decoration: none; }
+.detail-event-row a:hover { text-decoration: underline; }
+
+.detail-event-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 6px;
+}
+.detail-event-actions button {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #FFF;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-deep);
+}
+.detail-event-actions button.danger { color: #B33;}
+.detail-event-actions button:hover { background: var(--cream); }
+
+/* ─────────── EMPTY STATE ─────────── */
+.empty-day {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-mute);
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* ─────────── RESPONSIVE ─────────── */
+@media (max-width: 768px) {
+  body { padding: 16px 12px 60px; }
+  .calendar { display: none; }
+  .list-view { display: block; }
+  .month-title { font-size: 22px; }
+  .filters { padding: 10px 12px; gap: 6px; }
+  .filter-chip { padding: 5px 10px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="app-header">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true">
+      <rect width="96" height="96" rx="20" fill="#CC5500"/>
+      <path d="M 24 88 L 24 47 A 23 23 0 0 0 71 47 L 71 88 Z" fill="#FFFFFF"/>
+      <rect x="18" y="88" width="60" height="5" rx="2.5" fill="#FF8C00" opacity="0.35"/>
+    </svg>
+    <div class="brand-text">
+      <div class="brand-name">FOYER</div>
+      <div class="brand-tag">Agenda Cultural</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="sync-status" id="sync-status" title="Status da sincronização">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-text">Carregando…</span>
+    </span>
+    <button class="btn btn-ghost" id="btn-today">Hoje</button>
+    <button class="btn btn-primary" id="btn-add-quick">+ Novo evento</button>
+  </div>
+</header>
+
+<!-- ═══════════ FILTROS ═══════════ -->
+<div class="filters">
+  <span class="filter-label">Filtrar:</span>
+  <button class="filter-chip active" data-filter="all">Todos</button>
+  <button class="filter-chip" data-filter="cinema"><span class="filter-dot" style="background:#5B8DEF"></span>Cinema</button>
+  <button class="filter-chip" data-filter="teatro"><span class="filter-dot" style="background:#CC5500"></span>Teatro</button>
+  <button class="filter-chip" data-filter="danca"><span class="filter-dot" style="background:#C44D8A"></span>Dança</button>
+  <button class="filter-chip" data-filter="musica"><span class="filter-dot" style="background:#6B9D6F"></span>Música</button>
+  <button class="filter-chip" data-filter="outro"><span class="filter-dot" style="background:#8C7B6B"></span>Outro</button>
+</div>
+
+<!-- ═══════════ ABAS DE VIEW ═══════════ -->
+<div class="view-tabs">
+  <button class="view-tab active" data-view="calendar">
+    Calendário
+    <span class="count" id="count-confirmed">0</span>
+  </button>
+  <button class="view-tab" data-view="wishlist">
+    Save the Date
+    <span class="count" id="count-wishlist">0</span>
+  </button>
+</div>
+
+<!-- ═══════════ NAVEGAÇÃO DO MÊS ═══════════ -->
+<div class="month-nav" id="month-nav-wrap">
+  <div>
+    <span class="month-title" id="month-title">—</span>
+    <span class="month-counter" id="month-counter"></span>
+  </div>
+  <div class="month-nav-controls">
+    <button class="btn-icon" id="btn-prev" aria-label="Mês anterior">‹</button>
+    <button class="btn-icon" id="btn-next" aria-label="Próximo mês">›</button>
+  </div>
+</div>
+
+<!-- ═══════════ CALENDÁRIO GRID (DESKTOP) ═══════════ -->
+<div class="calendar" id="calendar">
+  <div class="weekdays">
+    <div class="weekday">Dom</div>
+    <div class="weekday">Seg</div>
+    <div class="weekday">Ter</div>
+    <div class="weekday">Qua</div>
+    <div class="weekday">Qui</div>
+    <div class="weekday">Sex</div>
+    <div class="weekday">Sáb</div>
+  </div>
+  <div class="days" id="days"></div>
+</div>
+
+<!-- ═══════════ LISTA (MOBILE) ═══════════ -->
+<div class="list-view" id="list-view"></div>
+
+<!-- ═══════════ WISHLIST VIEW ═══════════ -->
+<div class="wishlist-view" id="wishlist-view"></div>
+
+<!-- ═══════════ MODAL — CRIAR/EDITAR EVENTO ═══════════ -->
+<div class="modal-backdrop" id="modal-form">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-form-title">Novo evento</div>
+      <button class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <div style="display:flex; gap:8px;">
+          <label style="flex:1; display:flex; align-items:center; gap:6px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;" id="lbl-status-confirmado">
+            <input type="radio" name="status" value="confirmado" id="f-status-confirmado" checked>
+            <span>Confirmado</span>
+          </label>
+          <label style="flex:1; display:flex; align-items:center; gap:6px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;" id="lbl-status-savedate">
+            <input type="radio" name="status" value="savedate" id="f-status-savedate">
+            <span>Save the Date</span>
+          </label>
+        </div>
+        <div style="font-size:11px; color:var(--text-mute); margin-top:6px; line-height:1.4;">
+          <strong>Confirmado:</strong> evento com data marcada · <strong>Save the Date:</strong> ideia para o grupo (data ainda incerta)
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="f-title">Título</label>
+        <input type="text" id="f-title" class="form-input" placeholder="Ex: Hamlet — Theatro Municipal" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="f-type">Tipo</label>
+          <select id="f-type" class="form-select">
+            <option value="teatro">Teatro</option>
+            <option value="cinema">Cinema</option>
+            <option value="musica">Música</option>
+            <option value="danca">Dança</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group" id="grp-time">
+          <label class="form-label" for="f-time">Horário</label>
+          <input type="time" id="f-time" class="form-input">
+        </div>
+      </div>
+      <div class="form-group" id="grp-date">
+        <label class="form-label" for="f-date"><span id="lbl-date-text">Data</span></label>
+        <input type="date" id="f-date" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="f-price">Valor do ingresso</label>
+        <input type="text" id="f-price" class="form-input" placeholder="Ex: R$ 80, Grátis, R$ 30–60">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="f-link">Link para compra ou inscrição</label>
+        <input type="url" id="f-link" class="form-input" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="f-author">Adicionado por</label>
+        <input type="text" id="f-author" class="form-input" placeholder="Seu nome" required>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close>Cancelar</button>
+      <button class="btn btn-primary" id="btn-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL — DETALHES DO DIA ═══════════ -->
+<div class="modal-backdrop" id="modal-day">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-day-title">—</div>
+      <button class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <div class="day-detail-events" id="day-detail-events"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="btn-add-on-day">+ Adicionar evento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// FOYER — AGENDA CULTURAL · CALENDÁRIO V3
+// Storage: GitHub Contents API (events.json no próprio repo)
+// ═══════════════════════════════════════════════════════
+
+// ▼▼▼  CONFIGURAÇÃO — preencher antes de publicar  ▼▼▼
+const GH_OWNER  = '__GH_OWNER__';      // ex: 'anabeatriz'
+const GH_REPO   = 'foyer';                   // nome do repositório
+const GH_BRANCH = 'main';                    // branch onde events.json fica
+const GH_PATH   = 'data/events.json';        // caminho do arquivo
+const GH_TOKEN  = '__GH_TOKEN__';       // fine-grained PAT com Contents: write
+// ▲▲▲ ─────────────────────────────────────────── ▲▲▲
+
+const AUTHOR_KEY  = 'foyer_last_author';
+const POLL_MS     = 15000;
+const GH_API_BASE = 'https://api.github.com';
+
+const MONTHS_PT = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const WEEKDAYS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+// Estado global
+const state = {
+  currentMonth: new Date().getMonth(),
+  currentYear:  new Date().getFullYear(),
+  baseMonth:    new Date().getMonth(),
+  baseYear:     new Date().getFullYear(),
+  filter:       'all',
+  events:       [],
+  editingId:    null,
+  syncing:      false,
+  lastSync:     null,
+  pollTimer:    null,
+  fileSha:      null,    // SHA do arquivo events.json — necessário para PUT
+};
+
+// ─────────── SYNC STATUS UI ───────────
+function setSyncStatus(status, text) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-text');
+  dot.className = 'sync-dot ' + status;
+  txt.textContent = text;
+}
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => toast.classList.remove('show'), 2400);
+}
+
+// ─────────── BASE64 UTF-8 (handles emojis e acentos) ───────────
+function b64encode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function b64decode(b64) {
+  return decodeURIComponent(escape(atob(b64)));
+}
+
+// ─────────── GITHUB CONTENTS API ───────────
+function ghHeaders() {
+  return {
+    'Authorization': `Bearer ${GH_TOKEN}`,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+}
+
+async function fetchEventsFromGitHub() {
+  // Cache-buster força resposta fresca (GitHub API tem cache curto, mas ok)
+  const url = `${GH_API_BASE}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}?ref=${GH_BRANCH}&t=${Date.now()}`;
+  const res = await fetch(url, { headers: ghHeaders() });
+
+  if (res.status === 404) {
+    // Arquivo ainda não existe — primeiro uso
+    state.fileSha = null;
+    return [];
+  }
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    throw new Error(`GitHub GET ${res.status}: ${err.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  state.fileSha = data.sha;
+  const content = b64decode(data.content);
+  const parsed = JSON.parse(content);
+  return Array.isArray(parsed) ? parsed : (parsed.events || []);
+}
+
+async function pushEventsToGitHub(events, commitMessage) {
+  const url = `${GH_API_BASE}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`;
+  const body = {
+    message: commitMessage,
+    content: b64encode(JSON.stringify({ events, updatedAt: Date.now() }, null, 2)),
+    branch: GH_BRANCH
+  };
+  // Se o arquivo já existe, precisa do SHA; se não, omitir = criar novo
+  if (state.fileSha) body.sha = state.fileSha;
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    // 409 = SHA desatualizado (alguém commitou no meio) — caller deve retry
+    if (res.status === 409) throw new Error('CONFLICT');
+    throw new Error(`GitHub PUT ${res.status}: ${err.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  state.fileSha = data.content.sha;  // novo SHA após o commit
+  return data;
+}
+
+// ─────────── LOAD ───────────
+async function loadEvents(showFeedback = true) {
+  if (showFeedback) setSyncStatus('syncing', 'Sincronizando…');
+  try {
+    state.events = await fetchEventsFromGitHub();
+    state.lastSync = new Date();
+    setSyncStatus('ok', 'Sincronizado');
+    renderCalendar();
+  } catch (err) {
+    console.error('Erro ao carregar:', err);
+    setSyncStatus('error', 'Erro de conexão');
+    if (showFeedback) showToast('Erro ao carregar eventos. Verifique a configuração.', true);
+  }
+}
+
+// ─────────── SAVE com retry em caso de conflito ───────────
+async function saveEventsRemote(localChange, attempt = 1) {
+  setSyncStatus('syncing', 'Salvando…');
+  try {
+    // 1. Re-fetch para garantir SHA atualizado e mesclar mudanças
+    const remote = await fetchEventsFromGitHub();
+    // 2. Aplica a mudança local em cima da versão remota
+    const merged = applyChange(remote, localChange);
+    // 3. Mensagem de commit descritiva
+    const msg = commitMessageFor(localChange);
+    // 4. Grava
+    await pushEventsToGitHub(merged, msg);
+    state.events = merged;
+    state.lastSync = new Date();
+    setSyncStatus('ok', 'Sincronizado');
+    renderCalendar();
+    return true;
+  } catch (err) {
+    // 409: alguém commitou entre nosso GET e PUT — tenta de novo até 3x
+    if (err.message === 'CONFLICT' && attempt < 3) {
+      console.warn(`Conflito de SHA, tentativa ${attempt}/3`);
+      await new Promise(r => setTimeout(r, 300 * attempt));
+      return saveEventsRemote(localChange, attempt + 1);
+    }
+    console.error('Erro ao salvar:', err);
+    setSyncStatus('error', 'Erro ao salvar');
+    showToast('Não foi possível salvar. Tente novamente.', true);
+    return false;
+  }
+}
+
+// Mensagem do commit baseada no tipo de mudança
+function commitMessageFor(change) {
+  if (change.type === 'add')    return `add: ${change.event.title} (${change.event.author})`;
+  if (change.type === 'update') return `update: ${change.event.title} (${change.event.author})`;
+  if (change.type === 'delete') return `delete: evento ${change.id}`;
+  return 'update events';
+}
+
+// Aplica uma mudança em uma lista de eventos
+function applyChange(events, change) {
+  if (change.type === 'add') {
+    return [...events, change.event];
+  }
+  if (change.type === 'update') {
+    return events.map(e => e.id === change.event.id ? { ...e, ...change.event } : e);
+  }
+  if (change.type === 'delete') {
+    return events.filter(e => e.id !== change.id);
+  }
+  return events;
+}
+
+// ─────────── POLLING ───────────
+function startPolling() {
+  stopPolling();
+  state.pollTimer = setInterval(() => {
+    if (!state.syncing && document.visibilityState === 'visible') {
+      loadEvents(false);
+    }
+  }, POLL_MS);
+}
+function stopPolling() {
+  if (state.pollTimer) {
+    clearInterval(state.pollTimer);
+    state.pollTimer = null;
+  }
+}
+window.addEventListener('focus', () => loadEvents(false));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') loadEvents(false);
+});
+
+// ─────────── HELPERS ───────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function dateKey(y, m, d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
+function todayKey() {
+  const t = new Date();
+  return dateKey(t.getFullYear(), t.getMonth(), t.getDate());
+}
+function isSameMonth(y1, m1, y2, m2) { return y1 === y2 && m1 === m2; }
+function monthsDiff(y1, m1, y2, m2) { return (y2 - y1) * 12 + (m2 - m1); }
+
+// Eventos do dia (com filtro) — apenas confirmados aparecem no calendário
+function eventsOnDate(key) {
+  return state.events
+    .filter(e => e.date === key && e.status !== 'savedate')
+    .filter(e => state.filter === 'all' || e.type === state.filter)
+    .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+}
+
+// Eventos da wishlist (status === 'savedate')
+function wishlistEvents() {
+  return state.events
+    .filter(e => e.status === 'savedate')
+    .filter(e => state.filter === 'all' || e.type === state.filter)
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+// Conta eventos confirmados (com data)
+function confirmedCount() {
+  return state.events.filter(e => e.status !== 'savedate').length;
+}
+
+// ─────────── RENDER: GRID (DESKTOP) ───────────
+function renderCalendar() {
+  const { currentYear: y, currentMonth: m } = state;
+
+  // Title
+  document.getElementById('month-title').textContent = `${MONTHS_PT[m]} ${y}`;
+  const counter = monthsDiff(state.baseYear, state.baseMonth, y, m);
+  document.getElementById('month-counter').textContent =
+    counter === 0 ? '· mês atual' : `· ${counter}/6 meses adiante`;
+
+  // Disable nav buttons at limits
+  document.getElementById('btn-prev').disabled = counter <= 0;
+  document.getElementById('btn-next').disabled = counter >= 5;
+
+  // Grid de dias
+  const daysContainer = document.getElementById('days');
+  daysContainer.innerHTML = '';
+
+  const firstDay = new Date(y, m, 1);
+  const startWeekday = firstDay.getDay(); // 0 = Domingo
+  const lastDay = new Date(y, m + 1, 0).getDate();
+  const prevMonthLastDay = new Date(y, m, 0).getDate();
+  const tk = todayKey();
+
+  // Total de células: múltiplo de 7 que cobre todos os dias
+  const totalCells = Math.ceil((startWeekday + lastDay) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i++) {
+    const dayCell = document.createElement('div');
+    dayCell.className = 'day';
+
+    let cellY, cellM, cellD;
+    if (i < startWeekday) {
+      // Dia do mês anterior
+      dayCell.classList.add('other-month');
+      cellD = prevMonthLastDay - startWeekday + i + 1;
+      cellM = m - 1; cellY = y;
+      if (cellM < 0) { cellM = 11; cellY = y - 1; }
+    } else if (i >= startWeekday + lastDay) {
+      // Dia do mês seguinte
+      dayCell.classList.add('other-month');
+      cellD = i - startWeekday - lastDay + 1;
+      cellM = m + 1; cellY = y;
+      if (cellM > 11) { cellM = 0; cellY = y + 1; }
+    } else {
+      cellD = i - startWeekday + 1;
+      cellM = m; cellY = y;
+    }
+
+    const key = dateKey(cellY, cellM, cellD);
+    if (key === tk) dayCell.classList.add('today');
+
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num';
+    numEl.textContent = cellD;
+    dayCell.appendChild(numEl);
+
+    if (!dayCell.classList.contains('other-month')) {
+      const dayEvents = eventsOnDate(key);
+      const maxVisible = 3;
+      dayEvents.slice(0, maxVisible).forEach(ev => {
+        const pill = document.createElement('div');
+        pill.className = `event-pill t-${ev.type}`;
+        pill.textContent = (ev.time ? ev.time + ' ' : '') + ev.title;
+        pill.onclick = (e) => { e.stopPropagation(); openDayDetail(key); };
+        dayCell.appendChild(pill);
+      });
+      if (dayEvents.length > maxVisible) {
+        const more = document.createElement('div');
+        more.className = 'event-more';
+        more.textContent = `+ ${dayEvents.length - maxVisible} mais`;
+        more.onclick = (e) => { e.stopPropagation(); openDayDetail(key); };
+        dayCell.appendChild(more);
+      }
+      dayCell.onclick = () => openDayDetail(key);
+    }
+
+    daysContainer.appendChild(dayCell);
+  }
+
+  renderListView();
+
+  // Atualiza contadores das abas
+  const cConfirmed = document.getElementById('count-confirmed');
+  const cWishlist  = document.getElementById('count-wishlist');
+  if (cConfirmed) cConfirmed.textContent = confirmedCount();
+  if (cWishlist)  cWishlist.textContent  = state.events.filter(e => e.status === 'savedate').length;
+}
+
+// ─────────── RENDER: LIST (MOBILE) ───────────
+function renderListView() {
+  const { currentYear: y, currentMonth: m } = state;
+  const lastDay = new Date(y, m + 1, 0).getDate();
+  const tk = todayKey();
+  const container = document.getElementById('list-view');
+  container.innerHTML = '';
+
+  for (let d = 1; d <= lastDay; d++) {
+    const key = dateKey(y, m, d);
+    const dayEvents = eventsOnDate(key);
+    const weekday = WEEKDAYS_PT[new Date(y, m, d).getDay()];
+
+    const dayCard = document.createElement('div');
+    dayCard.className = 'list-day';
+    if (key === tk) dayCard.classList.add('today');
+
+    const header = document.createElement('div');
+    header.className = 'list-day-header';
+    header.innerHTML = `
+      <div class="list-day-date">
+        <span class="list-day-num">${d}</span>
+        <span class="list-day-name">${weekday}</span>
+      </div>
+      <button class="list-day-add" data-add-key="${key}">+</button>
+    `;
+    dayCard.appendChild(header);
+
+    const events = document.createElement('div');
+    events.className = 'list-events';
+    if (dayEvents.length === 0) {
+      events.innerHTML = '<div class="list-empty">Sem eventos</div>';
+    } else {
+      dayEvents.forEach(ev => {
+        const evEl = document.createElement('div');
+        evEl.className = `list-event t-${ev.type}`;
+        evEl.innerHTML = `
+          <div class="list-event-info">
+            <div class="list-event-title">${escapeHtml(ev.title)}</div>
+            <div class="list-event-meta">${ev.time ? ev.time + ' · ' : ''}${typeName(ev.type)}${ev.author ? ' · por ' + escapeHtml(ev.author) : ''}</div>
+          </div>
+          ${ev.price ? `<div class="list-event-price">${escapeHtml(ev.price)}</div>` : ''}
+        `;
+        evEl.onclick = () => openDayDetail(key);
+        events.appendChild(evEl);
+      });
+    }
+    dayCard.appendChild(events);
+    container.appendChild(dayCard);
+  }
+
+  // bind add buttons
+  container.querySelectorAll('[data-add-key]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      openFormModal({ date: btn.dataset.addKey });
+    };
+  });
+}
+
+// ─────────── HELPERS HTML/TIPOS ───────────
+function typeName(t) {
+  return ({ cinema: 'Cinema', teatro: 'Teatro', danca: 'Dança', musica: 'Música', outro: 'Outro' })[t] || t;
+}
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ─────────── MODAL — DETALHES DO DIA ───────────
+function openDayDetail(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  const title = `${d} de ${MONTHS_PT[m - 1]} · ${WEEKDAYS_PT[date.getDay()]}`;
+  document.getElementById('modal-day-title').textContent = title;
+
+  const dayEvents = eventsOnDate(key);
+  const container = document.getElementById('day-detail-events');
+  container.innerHTML = '';
+
+  if (dayEvents.length === 0) {
+    container.innerHTML = '<div class="empty-day">Nenhum evento neste dia ainda.<br>Use o botão abaixo para adicionar.</div>';
+  } else {
+    dayEvents.forEach(ev => {
+      const card = document.createElement('div');
+      card.className = `detail-event t-${ev.type}`;
+      card.innerHTML = `
+        <div class="detail-event-top">
+          <div class="detail-event-title">${escapeHtml(ev.title)}</div>
+          <div class="detail-event-type t-${ev.type}">${typeName(ev.type)}</div>
+        </div>
+        ${ev.time  ? `<div class="detail-event-row"><span class="lbl">Horário</span> <span>${ev.time}</span></div>` : ''}
+        ${ev.price ? `<div class="detail-event-row"><span class="lbl">Ingresso</span> <span>${escapeHtml(ev.price)}</span></div>` : ''}
+        ${ev.link  ? `<div class="detail-event-row"><span class="lbl">Link</span> <a href="${escapeHtml(ev.link)}" target="_blank" rel="noopener">abrir ↗</a></div>` : ''}
+        ${ev.author? `<div class="detail-event-row"><span class="lbl">Por</span> <span>${escapeHtml(ev.author)}</span></div>` : ''}
+        <div class="detail-event-actions">
+          <button data-edit="${ev.id}">Editar</button>
+          <button class="danger" data-delete="${ev.id}">Apagar</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    container.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.onclick = () => {
+        closeModal('modal-day');
+        const ev = state.events.find(x => x.id === btn.dataset.edit);
+        if (ev) openFormModal(ev);
+      };
+    });
+    container.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.onclick = async () => {
+        if (!confirm('Apagar este evento?')) return;
+        const ok = await saveEventsRemote({ type: 'delete', id: btn.dataset.delete });
+        if (ok) {
+          showToast('Evento apagado');
+          openDayDetail(key);
+        }
+      };
+    });
+  }
+
+  document.getElementById('btn-add-on-day').style.display = '';
+  document.getElementById('btn-add-on-day').onclick = () => {
+    closeModal('modal-day');
+    openFormModal({ date: key });
+  };
+
+  openModal('modal-day');
+}
+
+// ─────────── MODAL — FORMULÁRIO ───────────
+function openFormModal(prefill = {}) {
+  state.editingId = prefill.id || null;
+  document.getElementById('modal-form-title').textContent = prefill.id ? 'Editar evento' : 'Novo evento';
+
+  const status = prefill.status || 'confirmado';
+  document.getElementById('f-status-confirmado').checked = (status === 'confirmado');
+  document.getElementById('f-status-savedate').checked = (status === 'savedate');
+
+  document.getElementById('f-title').value  = prefill.title  || '';
+  document.getElementById('f-type').value   = prefill.type   || 'teatro';
+  document.getElementById('f-time').value   = prefill.time   || '';
+  document.getElementById('f-date').value   = prefill.date   || (status === 'confirmado' ? state.currentYear + '-' + pad(state.currentMonth + 1) + '-01' : '');
+  document.getElementById('f-price').value  = prefill.price  || '';
+  document.getElementById('f-link').value   = prefill.link   || '';
+  document.getElementById('f-author').value = prefill.author || localStorage.getItem(AUTHOR_KEY) || '';
+
+  // Define limites de data (hoje até 6 meses adiante)
+  const today = new Date();
+  const minDate = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
+  const maxDateObj = new Date(state.baseYear, state.baseMonth + 6, 0);
+  const maxDate = dateKey(maxDateObj.getFullYear(), maxDateObj.getMonth(), maxDateObj.getDate());
+  document.getElementById('f-date').min = minDate;
+  document.getElementById('f-date').max = maxDate;
+
+  updateFormStatus();
+  openModal('modal-form');
+  setTimeout(() => document.getElementById('f-title').focus(), 60);
+}
+
+async function saveEvent() {
+  const status = document.querySelector('input[name="status"]:checked').value;
+  const title  = document.getElementById('f-title').value.trim();
+  const type   = document.getElementById('f-type').value;
+  const time   = document.getElementById('f-time').value;
+  const date   = document.getElementById('f-date').value;
+  const price  = document.getElementById('f-price').value.trim();
+  const link   = document.getElementById('f-link').value.trim();
+  const author = document.getElementById('f-author').value.trim();
+
+  if (!title)  { alert('Informe um título.'); return; }
+  if (status === 'confirmado' && !date) { alert('Eventos confirmados precisam de data. Se ainda não tem certeza, escolha "Save the Date".'); return; }
+  if (!author) { alert('Informe seu nome em "Adicionado por".'); return; }
+
+  // Salva o nome para próximas vezes
+  localStorage.setItem(AUTHOR_KEY, author);
+
+  let change;
+  if (state.editingId) {
+    change = {
+      type: 'update',
+      event: { id: state.editingId, status, title, type, time, date, price, link, author, updatedAt: Date.now() }
+    };
+  } else {
+    change = {
+      type: 'add',
+      event: { id: uid(), status, title, type, time, date, price, link, author, createdAt: Date.now() }
+    };
+  }
+
+  // Desabilita botão durante save
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.textContent = 'Salvando…';
+
+  const ok = await saveEventsRemote(change);
+
+  btn.disabled = false;
+  btn.textContent = 'Salvar';
+
+  if (ok) {
+    closeModal('modal-form');
+    showToast(state.editingId ? 'Evento atualizado' : (status === 'savedate' ? 'Adicionado à wishlist' : 'Evento criado'));
+    // Se for confirmado e tem data, navega para o mês
+    if (status === 'confirmado' && date) {
+      const [y, m] = date.split('-').map(Number);
+      state.currentYear = y;
+      state.currentMonth = m - 1;
+    }
+    // Se foi criado um save the date, leva para a aba wishlist
+    if (status === 'savedate' && !state.editingId) {
+      switchView('wishlist');
+    } else {
+      renderCalendar();
+      if (state.currentView === 'wishlist') renderWishlist();
+    }
+  }
+}
+
+// ─────────── MODAL CONTROL ───────────
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('[data-close]').forEach(el => {
+  el.onclick = () => {
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('show'));
+  };
+});
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.onclick = (e) => { if (e.target === bd) bd.classList.remove('show'); };
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('show'));
+  }
+});
+
+// ─────────── NAV ───────────
+document.getElementById('btn-prev').onclick = () => {
+  const counter = monthsDiff(state.baseYear, state.baseMonth, state.currentYear, state.currentMonth);
+  if (counter <= 0) return;
+  state.currentMonth--;
+  if (state.currentMonth < 0) { state.currentMonth = 11; state.currentYear--; }
+  renderCalendar();
+};
+document.getElementById('btn-next').onclick = () => {
+  const counter = monthsDiff(state.baseYear, state.baseMonth, state.currentYear, state.currentMonth);
+  if (counter >= 5) return;
+  state.currentMonth++;
+  if (state.currentMonth > 11) { state.currentMonth = 0; state.currentYear++; }
+  renderCalendar();
+};
+document.getElementById('btn-today').onclick = () => {
+  state.currentMonth = state.baseMonth;
+  state.currentYear = state.baseYear;
+  renderCalendar();
+};
+document.getElementById('btn-add-quick').onclick = () => openFormModal();
+document.getElementById('btn-save').onclick = saveEvent;
+
+// ─────────── FILTROS ───────────
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.onclick = () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.filter = chip.dataset.filter;
+    renderCalendar();
+  };
+});
+
+// ─────────── VIEW SWITCHING (Calendário / Wishlist) ───────────
+state.currentView = 'calendar';
+
+function switchView(view) {
+  state.currentView = view;
+  document.querySelectorAll('.view-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.view === view);
+  });
+
+  const calendar     = document.getElementById('calendar');
+  const listView     = document.getElementById('list-view');
+  const wishlistView = document.getElementById('wishlist-view');
+  const monthNav     = document.getElementById('month-nav-wrap');
+
+  if (view === 'calendar') {
+    monthNav.style.display = '';
+    // calendar e list-view voltam ao normal (CSS controla via media query)
+    calendar.style.display = '';
+    listView.style.display = '';
+    wishlistView.classList.remove('show');
+  } else {
+    monthNav.style.display = 'none';
+    calendar.style.display = 'none';
+    listView.style.display = 'none';
+    wishlistView.classList.add('show');
+    renderWishlist();
+  }
+}
+
+document.querySelectorAll('.view-tab').forEach(tab => {
+  tab.onclick = () => switchView(tab.dataset.view);
+});
+
+// ─────────── RENDER WISHLIST ───────────
+function renderWishlist() {
+  const wishes = wishlistEvents();
+  const container = document.getElementById('wishlist-view');
+
+  if (wishes.length === 0) {
+    container.innerHTML = `
+      <div class="wishlist-empty">
+        <div class="wishlist-empty-title">Sua wishlist está vazia</div>
+        <div class="wishlist-empty-sub">
+          Crie um evento marcando "Save the Date" quando ainda não souber o dia certo.
+          Ele aparece aqui para o grupo discutir antes de virar evento confirmado.
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'wishlist-grid';
+
+  wishes.forEach(ev => {
+    const card = document.createElement('div');
+    card.className = `wishlist-card t-${ev.type}`;
+    card.innerHTML = `
+      <div class="wishlist-card-top">
+        <div class="wishlist-card-title">${escapeHtml(ev.title)}</div>
+        <div class="wishlist-card-type t-${ev.type}">${typeName(ev.type)}</div>
+      </div>
+      <div class="wishlist-card-meta">
+        ${ev.date ? `<div>📅 ${formatDateBR(ev.date)}${ev.time ? ' · ' + ev.time : ''}</div>` : '<div><em>Data ainda indefinida</em></div>'}
+        ${ev.author ? `<div>Adicionado por <strong>${escapeHtml(ev.author)}</strong></div>` : ''}
+      </div>
+      ${ev.price ? `<div class="wishlist-card-price">${escapeHtml(ev.price)}</div>` : ''}
+    `;
+    card.onclick = () => openWishlistDetail(ev);
+    grid.appendChild(card);
+  });
+
+  container.appendChild(grid);
+
+  // Update counters
+  document.getElementById('count-confirmed').textContent = confirmedCount();
+  document.getElementById('count-wishlist').textContent = wishes.length;
+}
+
+function openWishlistDetail(ev) {
+  // Reusa o modal de detalhes do dia para mostrar o item
+  document.getElementById('modal-day-title').textContent = ev.title;
+  const container = document.getElementById('day-detail-events');
+  container.innerHTML = `
+    <div class="detail-event t-${ev.type}">
+      <div class="detail-event-top">
+        <div class="detail-event-title">${escapeHtml(ev.title)}</div>
+        <div class="detail-event-type t-${ev.type}">${typeName(ev.type)}</div>
+      </div>
+      <div class="detail-event-row"><span class="lbl">Status</span> <span class="status-badge savedate">Save the Date</span></div>
+      ${ev.date  ? `<div class="detail-event-row"><span class="lbl">Data</span> <span>${formatDateBR(ev.date)}</span></div>` : '<div class="detail-event-row"><span class="lbl">Data</span> <em style="color:var(--text-mute)">ainda indefinida</em></div>'}
+      ${ev.time  ? `<div class="detail-event-row"><span class="lbl">Horário</span> <span>${ev.time}</span></div>` : ''}
+      ${ev.price ? `<div class="detail-event-row"><span class="lbl">Ingresso</span> <span>${escapeHtml(ev.price)}</span></div>` : ''}
+      ${ev.link  ? `<div class="detail-event-row"><span class="lbl">Link</span> <a href="${escapeHtml(ev.link)}" target="_blank" rel="noopener">abrir ↗</a></div>` : ''}
+      ${ev.author? `<div class="detail-event-row"><span class="lbl">Por</span> <span>${escapeHtml(ev.author)}</span></div>` : ''}
+      <div class="detail-event-actions">
+        <button data-edit="${ev.id}">Editar</button>
+        <button class="danger" data-delete="${ev.id}">Apagar</button>
+      </div>
+    </div>
+  `;
+
+  container.querySelector('[data-edit]').onclick = () => {
+    closeModal('modal-day');
+    openFormModal(ev);
+  };
+  container.querySelector('[data-delete]').onclick = async () => {
+    if (!confirm('Apagar este item da wishlist?')) return;
+    const ok = await saveEventsRemote({ type: 'delete', id: ev.id });
+    if (ok) {
+      showToast('Removido da wishlist');
+      closeModal('modal-day');
+      renderWishlist();
+    }
+  };
+
+  document.getElementById('btn-add-on-day').style.display = 'none';
+  openModal('modal-day');
+}
+
+// Helper para data formatada em PT-BR
+function formatDateBR(isoDate) {
+  if (!isoDate) return '';
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return `${d} de ${MONTHS_PT[m - 1]} de ${y}`;
+}
+
+// ─────────── FORM STATUS TOGGLE ───────────
+function updateFormStatus() {
+  const isSaveDate = document.getElementById('f-status-savedate').checked;
+  const dateField  = document.getElementById('f-date');
+  const lblDate    = document.getElementById('lbl-date-text');
+  const grpTime    = document.getElementById('grp-time');
+
+  // Toggle visual entre os dois cards de status
+  document.getElementById('lbl-status-confirmado').style.borderColor =
+    !isSaveDate ? 'var(--orange)' : 'var(--border)';
+  document.getElementById('lbl-status-confirmado').style.background =
+    !isSaveDate ? 'var(--cream)' : 'transparent';
+  document.getElementById('lbl-status-savedate').style.borderColor =
+    isSaveDate ? 'var(--orange)' : 'var(--border)';
+  document.getElementById('lbl-status-savedate').style.background =
+    isSaveDate ? 'var(--cream)' : 'transparent';
+
+  if (isSaveDate) {
+    lblDate.textContent = 'Data (opcional)';
+    dateField.required = false;
+    grpTime.style.opacity = '0.5';
+  } else {
+    lblDate.textContent = 'Data';
+    dateField.required = true;
+    grpTime.style.opacity = '1';
+  }
+}
+document.getElementById('f-status-confirmado').addEventListener('change', updateFormStatus);
+document.getElementById('f-status-savedate').addEventListener('change', updateFormStatus);
+
+// ─────────── INIT ───────────
+async function initApp() {
+  if (GH_TOKEN === 'COLE_AQUI_O_TOKEN' || GH_OWNER === 'SEU_USUARIO_GITHUB') {
+    setSyncStatus('error', 'Não configurado');
+    showToast('Configure GH_OWNER, GH_REPO e GH_TOKEN no início do <script>.', true);
+    return;
+  }
+  await loadEvents();
+  startPolling();
+}
+
+renderCalendar();   // primeira renderização (vazia)
+initApp();
+</script>
+</body>
+</html>
