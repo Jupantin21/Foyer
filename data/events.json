@@ -6,12 +6,13 @@
       "title": "Rei Lear Drag - Cia Extemporâne",
       "type": "teatro",
       "time": "19:00",
-      "date": "2026-05-07",
+      "date": "2026-05-16",
       "price": "Free",
       "link": "Teatro Paulo Eiró",
       "author": "Ju",
-      "createdAt": 1777922725400
+      "createdAt": 1777922725400,
+      "updatedAt": 1777922759257
     }
   ],
-  "updatedAt": 1777922725751
+  "updatedAt": 1777922759656
 }
