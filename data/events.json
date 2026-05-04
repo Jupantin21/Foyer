@@ -101,7 +101,7 @@
     {
       "id": "moroy5p3aqxdb1",
       "status": "savedate",
-      "title": "Amaro Freitas - Alaíde Costa",
+      "title": "Amaro Freitas Trio",
       "type": "musica",
       "time": "20:00",
       "location": "Sesc 14 Bis",
@@ -113,8 +113,9 @@
         "2026-05-17"
       ],
       "date": "2026-05-16",
-      "createdAt": 1777928877399
+      "createdAt": 1777928877399,
+      "updatedAt": 1777928889926
     }
   ],
-  "updatedAt": 1777928877766
+  "updatedAt": 1777928890312
 }
