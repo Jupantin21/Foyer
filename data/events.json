@@ -2,7 +2,7 @@
   "events": [
     {
       "id": "morlaas8ffe0ca",
-      "status": "savedate",
+      "status": "confirmado",
       "title": "Rei Lear Drag - Cia Extemporâne",
       "type": "teatro",
       "time": "19:00",
@@ -11,14 +11,10 @@
       "link": "Ingressos 1h antes do início na bilheteria do teatro",
       "author": "Ju",
       "createdAt": 1777922725400,
-      "updatedAt": 1777924032688,
+      "updatedAt": 1777924058426,
       "location": "Teatro Paulo Eiró",
-      "suggestedDates": [
-        "2026-05-16",
-        "2025-05-15",
-        "2025-05-07"
-      ]
+      "suggestedDates": []
     }
   ],
-  "updatedAt": 1777924033078
+  "updatedAt": 1777924058813
 }
