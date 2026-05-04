@@ -26,13 +26,13 @@
       "type": "teatro",
       "time": "20:00",
       "location": "Sesc Pinheiros",
-      "price": "Valores a confirmar",
+      "price": "",
       "link": "",
       "author": "Ju",
       "date": "2026-05-08",
       "suggestedDates": [],
       "createdAt": 1777924217896,
-      "updatedAt": 1777931002517
+      "updatedAt": 1777931019876
     },
     {
       "id": "morm8n4yr0l9if",
@@ -141,5 +141,5 @@
       "updatedAt": 1777929215762
     }
   ],
-  "updatedAt": 1777931003020
+  "updatedAt": 1777931020314
 }
