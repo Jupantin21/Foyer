@@ -271,25 +271,20 @@ body {
   display: inline-block;
   font-size: 9px;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 10px;
   letter-spacing: 1px;
   text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.status-badge.confirmado {
-  background: var(--type-musica);
+.status-badge.confirmado, .status-badge.confirmed {
+  background: var(--orange);
   color: #FFF;
 }
 .status-badge.savedate {
   background: var(--amber);
   color: var(--dark);
-}
-
-/* Pill de save the date no calendário (estilo distinto) */
-.event-pill.savedate {
-  font-style: italic;
-  background: var(--paper);
-  border-left-style: dashed;
 }
 
 /* ─────────── SYNC INDICATOR ─────────── */
@@ -528,25 +523,55 @@ body {
 
 .event-pill {
   font-size: 10.5px;
-  padding: 2px 6px;
+  padding: 3px 6px 3px 8px;
   border-radius: 4px;
   margin-bottom: 2px;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: var(--cream);
-  border-left: 3px solid var(--orange);
-  color: var(--text-deep);
+  background: var(--orange);
+  color: #FFFFFF;
   font-weight: 600;
   transition: opacity 0.15s ease;
+  border-left: 3px solid var(--orange);
+  position: relative;
 }
-.event-pill:hover { opacity: 0.8; }
-.event-pill.t-cinema  { border-left-color: var(--type-cinema); }
-.event-pill.t-teatro  { border-left-color: var(--type-teatro); }
-.event-pill.t-danca   { border-left-color: var(--type-danca); }
-.event-pill.t-musica  { border-left-color: var(--type-musica); }
-.event-pill.t-outro   { border-left-color: var(--type-outro); }
+.event-pill:hover { opacity: 0.85; }
+
+/* Confirmed state: solid orange background */
+.event-pill.confirmed {
+  background: var(--orange);
+  color: #FFFFFF;
+}
+
+/* Save the date: light/translucent — visually "lighter" weight */
+.event-pill.savedate {
+  background: var(--cream);
+  color: var(--text-deep);
+  font-style: italic;
+  border-left-style: dashed;
+  font-weight: 500;
+}
+
+/* Type indicator: small colored dot at the END (after title) */
+.event-pill .type-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.event-pill.t-cinema  .type-dot { background: var(--type-cinema); }
+.event-pill.t-teatro  .type-dot { background: var(--type-teatro); }
+.event-pill.t-danca   .type-dot { background: var(--type-danca); }
+.event-pill.t-musica  .type-dot { background: var(--type-musica); }
+.event-pill.t-outro   .type-dot { background: var(--type-outro); }
+
+/* Save the date dot needs to contrast with cream background */
+.event-pill.savedate.t-teatro .type-dot { background: var(--type-teatro); }
 
 .event-more {
   font-size: 10px;
@@ -624,14 +649,31 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  transition: opacity 0.15s ease;
 }
-.list-event.t-cinema  { border-left-color: var(--type-cinema); }
-.list-event.t-teatro  { border-left-color: var(--type-teatro); }
-.list-event.t-danca   { border-left-color: var(--type-danca); }
-.list-event.t-musica  { border-left-color: var(--type-musica); }
-.list-event.t-outro   { border-left-color: var(--type-outro); }
+
+/* Status-driven styling (primary) */
+.list-event.confirmed {
+  background: var(--paper);
+  border-left-color: var(--orange);
+}
+.list-event.savedate {
+  background: var(--cream);
+  border-left-color: var(--amber);
+  border-left-style: dashed;
+  opacity: 0.92;
+}
+
+/* Type-driven styling (subtle, only the dot inside the badge) */
 
 .list-event-info { flex: 1; min-width: 0; }
+.list-event-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
 .list-event-title {
   font-size: 13px;
   font-weight: 700;
@@ -639,6 +681,8 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 .list-event-meta {
   font-size: 10px;
@@ -980,6 +1024,19 @@ body {
         <label class="form-label" for="f-date"><span id="lbl-date-text">Data</span></label>
         <input type="date" id="f-date" class="form-input">
       </div>
+      <div class="form-group" id="grp-savedate-dates" style="display:none;">
+        <label class="form-label">Sugestões de data <span style="color:var(--text-mute); font-weight:400; text-transform:none; letter-spacing:0;">(até 3, opcional)</span></label>
+        <input type="date" id="f-date-1" class="form-input" style="margin-bottom:8px;" placeholder="Sugestão 1">
+        <input type="date" id="f-date-2" class="form-input" style="margin-bottom:8px;" placeholder="Sugestão 2">
+        <input type="date" id="f-date-3" class="form-input" placeholder="Sugestão 3">
+        <div style="font-size:11px; color:var(--text-mute); margin-top:6px; line-height:1.4;">
+          O evento aparecerá no calendário em todas as datas sugeridas, marcado como "a confirmar".
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="f-location">Local</label>
+        <input type="text" id="f-location" class="form-input" placeholder="Ex: Theatro Municipal, Centro · SP">
+      </div>
       <div class="form-group">
         <label class="form-label" for="f-price">Valor do ingresso</label>
         <input type="text" id="f-price" class="form-input" placeholder="Ex: R$ 80, Grátis, R$ 30–60">
@@ -1236,15 +1293,36 @@ function todayKey() {
 function isSameMonth(y1, m1, y2, m2) { return y1 === y2 && m1 === m2; }
 function monthsDiff(y1, m1, y2, m2) { return (y2 - y1) * 12 + (m2 - m1); }
 
-// Eventos do dia (com filtro) — apenas confirmados aparecem no calendário
-function eventsOnDate(key) {
-  return state.events
-    .filter(e => e.date === key && e.status !== 'savedate')
-    .filter(e => state.filter === 'all' || e.type === state.filter)
-    .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+// Retorna todas as datas que um evento ocupa.
+// - Confirmado: array com 1 elemento (event.date)
+// - Save the Date: array com até 3 elementos (datas sugeridas)
+function eventDates(ev) {
+  if (ev.status === 'savedate') {
+    // Para save the date, prioriza as datas múltiplas (suggestedDates)
+    // Compatibilidade: se tiver só 'date' antigo, usa-o
+    const arr = Array.isArray(ev.suggestedDates) ? ev.suggestedDates : [];
+    const filtered = arr.filter(d => d && d.length > 0);
+    if (filtered.length > 0) return filtered;
+    return ev.date ? [ev.date] : [];
+  }
+  return ev.date ? [ev.date] : [];
 }
 
-// Eventos da wishlist (status === 'savedate')
+// Eventos do dia (com filtro) — confirmados E save the date aparecem
+function eventsOnDate(key) {
+  return state.events
+    .filter(e => eventDates(e).includes(key))
+    .filter(e => state.filter === 'all' || e.type === state.filter)
+    .sort((a, b) => {
+      // Confirmados primeiro, depois save the dates
+      const sa = a.status === 'savedate' ? 1 : 0;
+      const sb = b.status === 'savedate' ? 1 : 0;
+      if (sa !== sb) return sa - sb;
+      return (a.time || '99').localeCompare(b.time || '99');
+    });
+}
+
+// Eventos da wishlist (status === 'savedate') — para a aba Save the Date
 function wishlistEvents() {
   return state.events
     .filter(e => e.status === 'savedate')
@@ -1252,7 +1330,7 @@ function wishlistEvents() {
     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 }
 
-// Conta eventos confirmados (com data)
+// Conta eventos confirmados
 function confirmedCount() {
   return state.events.filter(e => e.status !== 'savedate').length;
 }
@@ -1319,8 +1397,11 @@ function renderCalendar() {
       const maxVisible = 3;
       dayEvents.slice(0, maxVisible).forEach(ev => {
         const pill = document.createElement('div');
-        pill.className = `event-pill t-${ev.type}`;
-        pill.textContent = (ev.time ? ev.time + ' ' : '') + ev.title;
+        const statusClass = ev.status === 'savedate' ? 'savedate' : 'confirmed';
+        pill.className = `event-pill ${statusClass} t-${ev.type}`;
+        const timeStr = ev.time ? ev.time + ' ' : '';
+        const titleText = ev.title;
+        pill.innerHTML = `${escapeHtml(timeStr)}${escapeHtml(titleText)}<span class="type-dot"></span>`;
         pill.onclick = (e) => { e.stopPropagation(); openDayDetail(key); };
         dayCell.appendChild(pill);
       });
@@ -1381,11 +1462,16 @@ function renderListView() {
     } else {
       dayEvents.forEach(ev => {
         const evEl = document.createElement('div');
-        evEl.className = `list-event t-${ev.type}`;
+        const statusClass = ev.status === 'savedate' ? 'savedate' : 'confirmed';
+        evEl.className = `list-event ${statusClass} t-${ev.type}`;
+        const statusLabel = ev.status === 'savedate' ? 'Save the Date' : 'Confirmado';
         evEl.innerHTML = `
           <div class="list-event-info">
-            <div class="list-event-title">${escapeHtml(ev.title)}</div>
-            <div class="list-event-meta">${ev.time ? ev.time + ' · ' : ''}${typeName(ev.type)}${ev.author ? ' · por ' + escapeHtml(ev.author) : ''}</div>
+            <div class="list-event-status-row">
+              <span class="status-badge ${statusClass}">${statusLabel}</span>
+              <span class="list-event-title">${escapeHtml(ev.title)}</span>
+            </div>
+            <div class="list-event-meta">${ev.time ? ev.time + ' · ' : ''}${ev.location ? escapeHtml(ev.location) + ' · ' : ''}${typeName(ev.type)}${ev.author ? ' · por ' + escapeHtml(ev.author) : ''}</div>
           </div>
           ${ev.price ? `<div class="list-event-price">${escapeHtml(ev.price)}</div>` : ''}
         `;
@@ -1432,16 +1518,35 @@ function openDayDetail(key) {
   } else {
     dayEvents.forEach(ev => {
       const card = document.createElement('div');
-      card.className = `detail-event t-${ev.type}`;
+      const statusClass = ev.status === 'savedate' ? 'savedate' : 'confirmed';
+      const statusLabel = ev.status === 'savedate' ? 'Save the Date' : 'Confirmado';
+      card.className = `detail-event ${statusClass} t-${ev.type}`;
+
+      // For save the date, show OTHER suggested dates as info
+      let otherDatesHtml = '';
+      if (ev.status === 'savedate') {
+        const allDates = eventDates(ev);
+        const others = allDates.filter(d => d !== key);
+        if (others.length > 0) {
+          const formatted = others.map(d => formatDateBR(d)).join(' · ');
+          otherDatesHtml = `<div class="detail-event-row"><span class="lbl">Outras datas</span> <span style="font-style:italic;">${escapeHtml(formatted)}</span></div>`;
+        }
+      }
+
       card.innerHTML = `
         <div class="detail-event-top">
-          <div class="detail-event-title">${escapeHtml(ev.title)}</div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span class="status-badge ${statusClass}">${statusLabel}</span>
+            <div class="detail-event-title">${escapeHtml(ev.title)}</div>
+          </div>
           <div class="detail-event-type t-${ev.type}">${typeName(ev.type)}</div>
         </div>
         ${ev.time  ? `<div class="detail-event-row"><span class="lbl">Horário</span> <span>${ev.time}</span></div>` : ''}
+        ${ev.location ? `<div class="detail-event-row"><span class="lbl">Local</span> <span>${escapeHtml(ev.location)}</span></div>` : ''}
         ${ev.price ? `<div class="detail-event-row"><span class="lbl">Ingresso</span> <span>${escapeHtml(ev.price)}</span></div>` : ''}
         ${ev.link  ? `<div class="detail-event-row"><span class="lbl">Link</span> <a href="${escapeHtml(ev.link)}" target="_blank" rel="noopener">abrir ↗</a></div>` : ''}
         ${ev.author? `<div class="detail-event-row"><span class="lbl">Por</span> <span>${escapeHtml(ev.author)}</span></div>` : ''}
+        ${otherDatesHtml}
         <div class="detail-event-actions">
           <button data-edit="${ev.id}">Editar</button>
           <button class="danger" data-delete="${ev.id}">Apagar</button>
@@ -1487,21 +1592,30 @@ function openFormModal(prefill = {}) {
   document.getElementById('f-status-confirmado').checked = (status === 'confirmado');
   document.getElementById('f-status-savedate').checked = (status === 'savedate');
 
-  document.getElementById('f-title').value  = prefill.title  || '';
-  document.getElementById('f-type').value   = prefill.type   || 'teatro';
-  document.getElementById('f-time').value   = prefill.time   || '';
-  document.getElementById('f-date').value   = prefill.date   || (status === 'confirmado' ? state.currentYear + '-' + pad(state.currentMonth + 1) + '-01' : '');
-  document.getElementById('f-price').value  = prefill.price  || '';
-  document.getElementById('f-link').value   = prefill.link   || '';
-  document.getElementById('f-author').value = prefill.author || localStorage.getItem(AUTHOR_KEY) || '';
+  document.getElementById('f-title').value    = prefill.title    || '';
+  document.getElementById('f-type').value     = prefill.type     || 'teatro';
+  document.getElementById('f-time').value     = prefill.time     || '';
+  document.getElementById('f-date').value     = prefill.date     || (status === 'confirmado' ? state.currentYear + '-' + pad(state.currentMonth + 1) + '-01' : '');
+  document.getElementById('f-location').value = prefill.location || '';
+  document.getElementById('f-price').value    = prefill.price    || '';
+  document.getElementById('f-link').value     = prefill.link     || '';
+  document.getElementById('f-author').value   = prefill.author   || localStorage.getItem(AUTHOR_KEY) || '';
+
+  // Sugestões de data (até 3) — apenas para Save the Date
+  const sugg = Array.isArray(prefill.suggestedDates) ? prefill.suggestedDates : [];
+  document.getElementById('f-date-1').value = sugg[0] || (prefill.date && status === 'savedate' ? prefill.date : '');
+  document.getElementById('f-date-2').value = sugg[1] || '';
+  document.getElementById('f-date-3').value = sugg[2] || '';
 
   // Define limites de data (hoje até 6 meses adiante)
   const today = new Date();
   const minDate = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
   const maxDateObj = new Date(state.baseYear, state.baseMonth + 6, 0);
   const maxDate = dateKey(maxDateObj.getFullYear(), maxDateObj.getMonth(), maxDateObj.getDate());
-  document.getElementById('f-date').min = minDate;
-  document.getElementById('f-date').max = maxDate;
+  ['f-date', 'f-date-1', 'f-date-2', 'f-date-3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.min = minDate; el.max = maxDate; }
+  });
 
   updateFormStatus();
   openModal('modal-form');
@@ -1509,14 +1623,25 @@ function openFormModal(prefill = {}) {
 }
 
 async function saveEvent() {
-  const status = document.querySelector('input[name="status"]:checked').value;
-  const title  = document.getElementById('f-title').value.trim();
-  const type   = document.getElementById('f-type').value;
-  const time   = document.getElementById('f-time').value;
-  const date   = document.getElementById('f-date').value;
-  const price  = document.getElementById('f-price').value.trim();
-  const link   = document.getElementById('f-link').value.trim();
-  const author = document.getElementById('f-author').value.trim();
+  const status   = document.querySelector('input[name="status"]:checked').value;
+  const title    = document.getElementById('f-title').value.trim();
+  const type     = document.getElementById('f-type').value;
+  const time     = document.getElementById('f-time').value;
+  const date     = document.getElementById('f-date').value;
+  const location = document.getElementById('f-location').value.trim();
+  const price    = document.getElementById('f-price').value.trim();
+  const link     = document.getElementById('f-link').value.trim();
+  const author   = document.getElementById('f-author').value.trim();
+
+  // Para Save the Date: coleta as 3 sugestões de data
+  let suggestedDates = [];
+  if (status === 'savedate') {
+    suggestedDates = [
+      document.getElementById('f-date-1').value,
+      document.getElementById('f-date-2').value,
+      document.getElementById('f-date-3').value,
+    ].filter(d => d && d.length > 0);
+  }
 
   if (!title)  { alert('Informe um título.'); return; }
   if (status === 'confirmado' && !date) { alert('Eventos confirmados precisam de data. Se ainda não tem certeza, escolha "Save the Date".'); return; }
@@ -1525,16 +1650,27 @@ async function saveEvent() {
   // Salva o nome para próximas vezes
   localStorage.setItem(AUTHOR_KEY, author);
 
+  // Constrói o evento. Para save the date, salva suggestedDates;
+  // para confirmado, mantém date como string única.
+  const baseEvent = { status, title, type, time, location, price, link, author };
+  if (status === 'savedate') {
+    baseEvent.suggestedDates = suggestedDates;
+    baseEvent.date = suggestedDates[0] || ''; // primeira sugestão como "data principal" (fallback)
+  } else {
+    baseEvent.date = date;
+    baseEvent.suggestedDates = []; // limpa caso esteja editando de save the date para confirmado
+  }
+
   let change;
   if (state.editingId) {
     change = {
       type: 'update',
-      event: { id: state.editingId, status, title, type, time, date, price, link, author, updatedAt: Date.now() }
+      event: { id: state.editingId, ...baseEvent, updatedAt: Date.now() }
     };
   } else {
     change = {
       type: 'add',
-      event: { id: uid(), status, title, type, time, date, price, link, author, createdAt: Date.now() }
+      event: { id: uid(), ...baseEvent, createdAt: Date.now() }
     };
   }
 
@@ -1676,13 +1812,24 @@ function renderWishlist() {
   wishes.forEach(ev => {
     const card = document.createElement('div');
     card.className = `wishlist-card t-${ev.type}`;
+    const dates = eventDates(ev);
+    let datesHtml;
+    if (dates.length === 0) {
+      datesHtml = '<div><em>Data ainda indefinida</em></div>';
+    } else if (dates.length === 1) {
+      datesHtml = `<div>📅 ${formatDateBR(dates[0])}${ev.time ? ' · ' + ev.time : ''}</div>`;
+    } else {
+      const dateList = dates.map(d => formatDateBR(d)).join(' · ');
+      datesHtml = `<div>📅 <strong>${dates.length} sugestões:</strong></div><div style="margin-top:2px;">${dateList}</div>`;
+    }
     card.innerHTML = `
       <div class="wishlist-card-top">
         <div class="wishlist-card-title">${escapeHtml(ev.title)}</div>
         <div class="wishlist-card-type t-${ev.type}">${typeName(ev.type)}</div>
       </div>
       <div class="wishlist-card-meta">
-        ${ev.date ? `<div>📅 ${formatDateBR(ev.date)}${ev.time ? ' · ' + ev.time : ''}</div>` : '<div><em>Data ainda indefinida</em></div>'}
+        ${datesHtml}
+        ${ev.location ? `<div>📍 ${escapeHtml(ev.location)}</div>` : ''}
         ${ev.author ? `<div>Adicionado por <strong>${escapeHtml(ev.author)}</strong></div>` : ''}
       </div>
       ${ev.price ? `<div class="wishlist-card-price">${escapeHtml(ev.price)}</div>` : ''}
@@ -1702,15 +1849,31 @@ function openWishlistDetail(ev) {
   // Reusa o modal de detalhes do dia para mostrar o item
   document.getElementById('modal-day-title').textContent = ev.title;
   const container = document.getElementById('day-detail-events');
+
+  // Build dates row
+  const dates = eventDates(ev);
+  let datesHtml;
+  if (dates.length === 0) {
+    datesHtml = '<div class="detail-event-row"><span class="lbl">Datas</span> <em style="color:var(--text-mute)">ainda indefinidas</em></div>';
+  } else if (dates.length === 1) {
+    datesHtml = `<div class="detail-event-row"><span class="lbl">Data</span> <span>${formatDateBR(dates[0])}</span></div>`;
+  } else {
+    const dateList = dates.map(d => `<div>${formatDateBR(d)}</div>`).join('');
+    datesHtml = `<div class="detail-event-row"><span class="lbl">Datas (${dates.length})</span> <div>${dateList}</div></div>`;
+  }
+
   container.innerHTML = `
-    <div class="detail-event t-${ev.type}">
+    <div class="detail-event savedate t-${ev.type}">
       <div class="detail-event-top">
-        <div class="detail-event-title">${escapeHtml(ev.title)}</div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span class="status-badge savedate">Save the Date</span>
+          <div class="detail-event-title">${escapeHtml(ev.title)}</div>
+        </div>
         <div class="detail-event-type t-${ev.type}">${typeName(ev.type)}</div>
       </div>
-      <div class="detail-event-row"><span class="lbl">Status</span> <span class="status-badge savedate">Save the Date</span></div>
-      ${ev.date  ? `<div class="detail-event-row"><span class="lbl">Data</span> <span>${formatDateBR(ev.date)}</span></div>` : '<div class="detail-event-row"><span class="lbl">Data</span> <em style="color:var(--text-mute)">ainda indefinida</em></div>'}
+      ${datesHtml}
       ${ev.time  ? `<div class="detail-event-row"><span class="lbl">Horário</span> <span>${ev.time}</span></div>` : ''}
+      ${ev.location ? `<div class="detail-event-row"><span class="lbl">Local</span> <span>${escapeHtml(ev.location)}</span></div>` : ''}
       ${ev.price ? `<div class="detail-event-row"><span class="lbl">Ingresso</span> <span>${escapeHtml(ev.price)}</span></div>` : ''}
       ${ev.link  ? `<div class="detail-event-row"><span class="lbl">Link</span> <a href="${escapeHtml(ev.link)}" target="_blank" rel="noopener">abrir ↗</a></div>` : ''}
       ${ev.author? `<div class="detail-event-row"><span class="lbl">Por</span> <span>${escapeHtml(ev.author)}</span></div>` : ''}
@@ -1750,7 +1913,8 @@ function formatDateBR(isoDate) {
 function updateFormStatus() {
   const isSaveDate = document.getElementById('f-status-savedate').checked;
   const dateField  = document.getElementById('f-date');
-  const lblDate    = document.getElementById('lbl-date-text');
+  const grpDate    = document.getElementById('grp-date');
+  const grpSavedateDates = document.getElementById('grp-savedate-dates');
   const grpTime    = document.getElementById('grp-time');
 
   // Toggle visual entre os dois cards de status
@@ -1764,11 +1928,15 @@ function updateFormStatus() {
     isSaveDate ? 'var(--cream)' : 'transparent';
 
   if (isSaveDate) {
-    lblDate.textContent = 'Data (opcional)';
+    // Save the Date: esconde campo único de data, mostra os 3 sugeridos
+    grpDate.style.display = 'none';
+    grpSavedateDates.style.display = '';
     dateField.required = false;
     grpTime.style.opacity = '0.5';
   } else {
-    lblDate.textContent = 'Data';
+    // Confirmado: mostra campo único, esconde os 3 sugeridos
+    grpDate.style.display = '';
+    grpSavedateDates.style.display = 'none';
     dateField.required = true;
     grpTime.style.opacity = '1';
   }
