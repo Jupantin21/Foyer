@@ -447,10 +447,18 @@ body {
   gap: 8px;
 }
 
-/* ─────────── CALENDÁRIO GRID (DESKTOP) ─────────── */
-.calendar {
-  max-width: 1200px;
+/* ─────────── LAYOUT HÍBRIDO: GRADE + PAINEL LATERAL ─────────── */
+.calendar-layout {
+  max-width: 1280px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ─────────── CALENDÁRIO GRID COMPACTO ─────────── */
+.calendar {
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -465,8 +473,8 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .weekday {
-  padding: 12px 8px;
-  font-size: 10px;
+  padding: 14px 8px;
+  font-size: 11px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--text-mute);
@@ -480,8 +488,8 @@ body {
 }
 
 .day {
-  min-height: 110px;
-  padding: 8px;
+  min-height: 86px;
+  padding: 10px 8px 8px;
   border-right: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
   cursor: pointer;
@@ -489,15 +497,15 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 .day:nth-child(7n) { border-right: none; }
-.day:hover { background: #FFF8EE; }
+.day:hover:not(.other-month) { background: #FFF8EE; }
 
 .day.other-month {
   background: #FAF5EC;
   cursor: default;
 }
-.day.other-month:hover { background: #FAF5EC; }
 .day.other-month .day-num { color: #C8B89A; }
 
 .day.today {
@@ -508,17 +516,184 @@ body {
   color: #FFF;
 }
 
+.day.selected {
+  background: var(--cream);
+  box-shadow: inset 0 0 0 2px var(--orange);
+}
+
 .day-num {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   color: var(--dark);
+}
+
+/* Bolinhas de tipo (em vez de pills cheios) */
+.day-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+}
+.day-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+.day-dot.t-cinema  { background: var(--type-cinema); }
+.day-dot.t-teatro  { background: var(--type-teatro); }
+.day-dot.t-danca   { background: var(--type-danca); }
+.day-dot.t-musica  { background: var(--type-musica); }
+.day-dot.t-outro   { background: var(--type-outro); }
+
+/* Save the date: bolinha vazada (anel) */
+.day-dot.savedate {
+  background: transparent;
+  border: 1.5px solid var(--type-teatro);
+}
+.day-dot.savedate.t-cinema  { border-color: var(--type-cinema); background: transparent; }
+.day-dot.savedate.t-teatro  { border-color: var(--type-teatro); background: transparent; }
+.day-dot.savedate.t-danca   { border-color: var(--type-danca); background: transparent; }
+.day-dot.savedate.t-musica  { border-color: var(--type-musica); background: transparent; }
+.day-dot.savedate.t-outro   { border-color: var(--type-outro); background: transparent; }
+
+.day-count {
+  font-size: 9px;
+  color: var(--text-mute);
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+/* ─────────── PAINEL LATERAL DE PRÓXIMOS EVENTOS ─────────── */
+.sidebar {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(26,10,0,0.04);
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 14px 16px 12px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-title {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-mute);
+}
+.sidebar-subtitle {
+  font-size: 13px;
+  color: var(--dark);
+  font-weight: 600;
+  margin-top: 4px;
+}
+.sidebar-clear {
+  font-size: 10px;
+  color: var(--orange);
+  cursor: pointer;
+  margin-top: 6px;
+  font-weight: 600;
+  text-decoration: underline;
+  display: inline-block;
+}
+
+.sidebar-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 12px 16px;
+}
+
+.sidebar-event {
+  background: #FFF;
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--orange);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.sidebar-event:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 6px rgba(26,10,0,0.06);
+}
+.sidebar-event.savedate {
+  background: var(--cream);
+  border-left-style: dashed;
+  border-left-color: var(--amber);
+}
+
+.sidebar-event-date {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--orange);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sidebar-event.savedate .sidebar-event-date { color: var(--text-mute); }
+
+.sidebar-event-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: -0.1px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.sidebar-event-meta {
+  font-size: 10.5px;
+  color: var(--text-mute);
+  line-height: 1.45;
+}
+
+.sidebar-event-status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.sidebar-event-status-row .status-badge {
+  font-size: 8px;
+  padding: 2px 6px;
+}
+.sidebar-event-type-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.sidebar-event-type-dot.t-cinema  { background: var(--type-cinema); }
+.sidebar-event-type-dot.t-teatro  { background: var(--type-teatro); }
+.sidebar-event-type-dot.t-danca   { background: var(--type-danca); }
+.sidebar-event-type-dot.t-musica  { background: var(--type-musica); }
+.sidebar-event-type-dot.t-outro   { background: var(--type-outro); }
+
+.sidebar-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-mute);
+  font-size: 12px;
+  font-style: italic;
 }
 
 .event-pill {
@@ -886,13 +1061,59 @@ body {
 }
 
 /* ─────────── RESPONSIVE ─────────── */
-@media (max-width: 768px) {
-  body { padding: 16px 12px 60px; }
+/* Estado vazio quando não há eventos no mês (mobile/lista) */
+.list-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--bg-soft);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  margin: 0 auto;
+  max-width: 480px;
+}
+.list-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+.list-empty-sub {
+  font-size: 13px;
+  color: var(--text-mute);
+  line-height: 1.5;
+}
+
+/* ─────────── RESPONSIVO ─────────── */
+
+/* Tablet (768-1024px): grade fica oculta, sidebar oculta, lista expandida em largura maior */
+@media (max-width: 1023px) {
+  .calendar-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .sidebar { display: none; }
   .calendar { display: none; }
-  .list-view { display: block; }
+  .list-view {
+    display: block;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+/* Mobile (<768px): mesma lista, mais compacta */
+@media (max-width: 767px) {
+  body { padding: 16px 12px 60px; }
   .month-title { font-size: 22px; }
   .filters { padding: 10px 12px; gap: 6px; }
   .filter-chip { padding: 5px 10px; font-size: 11px; }
+  .view-tabs { width: 100%; }
+  .view-tab { flex: 1; justify-content: center; }
+  .list-view { max-width: 100%; }
+}
+
+/* Desktop (≥1024px): híbrido grade + sidebar */
+@media (min-width: 1024px) {
+  .list-view { display: none; }
 }
 </style>
 </head>
@@ -956,18 +1177,30 @@ body {
   </div>
 </div>
 
-<!-- ═══════════ CALENDÁRIO GRID (DESKTOP) ═══════════ -->
-<div class="calendar" id="calendar">
-  <div class="weekdays">
-    <div class="weekday">Dom</div>
-    <div class="weekday">Seg</div>
-    <div class="weekday">Ter</div>
-    <div class="weekday">Qua</div>
-    <div class="weekday">Qui</div>
-    <div class="weekday">Sex</div>
-    <div class="weekday">Sáb</div>
+<!-- ═══════════ LAYOUT HÍBRIDO: GRADE + SIDEBAR (DESKTOP/WEB) ═══════════ -->
+<div class="calendar-layout" id="calendar-layout">
+  <div class="calendar" id="calendar">
+    <div class="weekdays">
+      <div class="weekday">Dom</div>
+      <div class="weekday">Seg</div>
+      <div class="weekday">Ter</div>
+      <div class="weekday">Qua</div>
+      <div class="weekday">Qui</div>
+      <div class="weekday">Sex</div>
+      <div class="weekday">Sáb</div>
+    </div>
+    <div class="days" id="days"></div>
   </div>
-  <div class="days" id="days"></div>
+
+  <!-- Painel lateral de próximos eventos -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title" id="sidebar-title">Próximos eventos</div>
+      <div class="sidebar-subtitle" id="sidebar-subtitle">a partir de hoje</div>
+      <span class="sidebar-clear" id="sidebar-clear" style="display:none;" onclick="clearDaySelection()">← voltar para próximos</span>
+    </div>
+    <div class="sidebar-content" id="sidebar-content"></div>
+  </aside>
 </div>
 
 <!-- ═══════════ LISTA (MOBILE) ═══════════ -->
@@ -1110,6 +1343,7 @@ const state = {
   lastSync:     null,
   pollTimer:    null,
   fileSha:      null,    // SHA do arquivo events.json — necessário para PUT
+  selectedDay:  null,    // dia selecionado para filtrar sidebar (key 'YYYY-MM-DD')
 };
 
 // ─────────── SYNC STATUS UI ───────────
@@ -1335,6 +1569,103 @@ function confirmedCount() {
   return state.events.filter(e => e.status !== 'savedate').length;
 }
 
+// ─────────── SELEÇÃO DE DIA + SIDEBAR ───────────
+function selectDay(key) {
+  // Toggle: clicar de novo no mesmo dia desfaz a seleção
+  if (state.selectedDay === key) {
+    state.selectedDay = null;
+  } else {
+    state.selectedDay = key;
+  }
+  renderCalendar();
+}
+
+function clearDaySelection() {
+  state.selectedDay = null;
+  renderCalendar();
+}
+
+// Retorna lista plana de "ocorrências" — cada save the date com 3 datas vira 3 ocorrências.
+// Cada ocorrência tem { event, date }. Filtros aplicados.
+function flattenEventOccurrences() {
+  const out = [];
+  state.events.forEach(ev => {
+    if (state.filter !== 'all' && ev.type !== state.filter) return;
+    const dates = eventDates(ev);
+    if (dates.length === 0) {
+      // Save the date sem nenhuma data sugerida não aparece no sidebar
+      return;
+    }
+    dates.forEach(d => {
+      out.push({ event: ev, date: d });
+    });
+  });
+  return out;
+}
+
+function renderSidebar() {
+  const titleEl    = document.getElementById('sidebar-title');
+  const subtitleEl = document.getElementById('sidebar-subtitle');
+  const clearEl    = document.getElementById('sidebar-clear');
+  const contentEl  = document.getElementById('sidebar-content');
+  if (!contentEl) return;
+
+  let occurrences = flattenEventOccurrences();
+  let listToShow;
+
+  if (state.selectedDay) {
+    // Filtrado: só ocorrências do dia selecionado
+    titleEl.textContent = 'Eventos do dia';
+    const [yy, mm, dd] = state.selectedDay.split('-').map(Number);
+    subtitleEl.textContent = `${dd} de ${MONTHS_PT[mm - 1]} de ${yy}`;
+    clearEl.style.display = 'inline-block';
+    listToShow = occurrences.filter(o => o.date === state.selectedDay);
+  } else {
+    // Próximos eventos a partir de hoje
+    titleEl.textContent = 'Próximos eventos';
+    subtitleEl.textContent = 'a partir de hoje';
+    clearEl.style.display = 'none';
+    const today = todayKey();
+    listToShow = occurrences
+      .filter(o => o.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 12);
+  }
+
+  if (listToShow.length === 0) {
+    contentEl.innerHTML = `<div class="sidebar-empty">${state.selectedDay ? 'Nenhum evento neste dia.' : 'Nenhum evento futuro ainda.'}</div>`;
+    return;
+  }
+
+  contentEl.innerHTML = '';
+  listToShow.forEach(occ => {
+    const ev = occ.event;
+    const isSavedate = ev.status === 'savedate';
+    const card = document.createElement('div');
+    card.className = `sidebar-event ${isSavedate ? 'savedate' : ''}`;
+
+    const [yy, mm, dd] = occ.date.split('-').map(Number);
+    const dateLabel = `${dd} ${MONTHS_PT[mm - 1].slice(0, 3).toUpperCase()}${ev.time ? ' · ' + ev.time : ''}`;
+    const statusLabel = isSavedate ? 'Save the Date' : 'Confirmado';
+    const statusClass = isSavedate ? 'savedate' : 'confirmed';
+
+    card.innerHTML = `
+      <div class="sidebar-event-date">${dateLabel}</div>
+      <div class="sidebar-event-status-row">
+        <span class="status-badge ${statusClass}">${statusLabel}</span>
+        <span class="sidebar-event-type-dot t-${ev.type}"></span>
+      </div>
+      <div class="sidebar-event-title">${escapeHtml(ev.title)}</div>
+      <div class="sidebar-event-meta">
+        ${ev.location ? escapeHtml(ev.location) + '<br>' : ''}
+        ${typeName(ev.type)}${ev.author ? ' · ' + escapeHtml(ev.author) : ''}${ev.price ? ' · ' + escapeHtml(ev.price) : ''}
+      </div>
+    `;
+    card.onclick = () => openDayDetail(occ.date);
+    contentEl.appendChild(card);
+  });
+}
+
 // ─────────── RENDER: GRID (DESKTOP) ───────────
 function renderCalendar() {
   const { currentYear: y, currentMonth: m } = state;
@@ -1394,31 +1725,41 @@ function renderCalendar() {
 
     if (!dayCell.classList.contains('other-month')) {
       const dayEvents = eventsOnDate(key);
-      const maxVisible = 3;
-      dayEvents.slice(0, maxVisible).forEach(ev => {
-        const pill = document.createElement('div');
-        const statusClass = ev.status === 'savedate' ? 'savedate' : 'confirmed';
-        pill.className = `event-pill ${statusClass} t-${ev.type}`;
-        const timeStr = ev.time ? ev.time + ' ' : '';
-        const titleText = ev.title;
-        pill.innerHTML = `${escapeHtml(timeStr)}${escapeHtml(titleText)}<span class="type-dot"></span>`;
-        pill.onclick = (e) => { e.stopPropagation(); openDayDetail(key); };
-        dayCell.appendChild(pill);
-      });
-      if (dayEvents.length > maxVisible) {
-        const more = document.createElement('div');
-        more.className = 'event-more';
-        more.textContent = `+ ${dayEvents.length - maxVisible} mais`;
-        more.onclick = (e) => { e.stopPropagation(); openDayDetail(key); };
-        dayCell.appendChild(more);
+
+      // Marca dia selecionado (quando usuário clicou para filtrar sidebar)
+      if (state.selectedDay === key) {
+        dayCell.classList.add('selected');
       }
-      dayCell.onclick = () => openDayDetail(key);
+
+      if (dayEvents.length > 0) {
+        const dotsContainer = document.createElement('div');
+        dotsContainer.className = 'day-dots';
+        const maxDots = 5;
+        dayEvents.slice(0, maxDots).forEach(ev => {
+          const dot = document.createElement('span');
+          const statusClass = ev.status === 'savedate' ? 'savedate' : '';
+          dot.className = `day-dot ${statusClass} t-${ev.type}`;
+          dot.title = ev.title;
+          dotsContainer.appendChild(dot);
+        });
+        if (dayEvents.length > maxDots) {
+          const count = document.createElement('span');
+          count.className = 'day-count';
+          count.textContent = `+${dayEvents.length - maxDots}`;
+          dotsContainer.appendChild(count);
+        }
+        dayCell.appendChild(dotsContainer);
+      }
+
+      // Click no dia: filtra o sidebar (não abre modal direto na grade compacta)
+      dayCell.onclick = () => selectDay(key);
     }
 
     daysContainer.appendChild(dayCell);
   }
 
   renderListView();
+  renderSidebar();
 
   // Atualiza contadores das abas
   const cConfirmed = document.getElementById('count-confirmed');
@@ -1435,9 +1776,28 @@ function renderListView() {
   const container = document.getElementById('list-view');
   container.innerHTML = '';
 
+  // Coletar dias do mês que têm eventos (filtra dias vazios)
+  const daysWithEvents = [];
   for (let d = 1; d <= lastDay; d++) {
     const key = dateKey(y, m, d);
     const dayEvents = eventsOnDate(key);
+    if (dayEvents.length > 0) {
+      daysWithEvents.push({ d, key, dayEvents });
+    }
+  }
+
+  // Estado vazio: nenhum dia do mês tem eventos
+  if (daysWithEvents.length === 0) {
+    container.innerHTML = `
+      <div class="list-empty-state">
+        <div class="list-empty-title">Nenhum evento em ${MONTHS_PT[m]}</div>
+        <div class="list-empty-sub">Use o botão "+ Novo evento" para adicionar.</div>
+      </div>
+    `;
+    return;
+  }
+
+  daysWithEvents.forEach(({ d, key, dayEvents }) => {
     const weekday = WEEKDAYS_PT[new Date(y, m, d).getDay()];
 
     const dayCard = document.createElement('div');
@@ -1457,31 +1817,27 @@ function renderListView() {
 
     const events = document.createElement('div');
     events.className = 'list-events';
-    if (dayEvents.length === 0) {
-      events.innerHTML = '<div class="list-empty">Sem eventos</div>';
-    } else {
-      dayEvents.forEach(ev => {
-        const evEl = document.createElement('div');
-        const statusClass = ev.status === 'savedate' ? 'savedate' : 'confirmed';
-        evEl.className = `list-event ${statusClass} t-${ev.type}`;
-        const statusLabel = ev.status === 'savedate' ? 'Save the Date' : 'Confirmado';
-        evEl.innerHTML = `
-          <div class="list-event-info">
-            <div class="list-event-status-row">
-              <span class="status-badge ${statusClass}">${statusLabel}</span>
-              <span class="list-event-title">${escapeHtml(ev.title)}</span>
-            </div>
-            <div class="list-event-meta">${ev.time ? ev.time + ' · ' : ''}${ev.location ? escapeHtml(ev.location) + ' · ' : ''}${typeName(ev.type)}${ev.author ? ' · por ' + escapeHtml(ev.author) : ''}</div>
+    dayEvents.forEach(ev => {
+      const evEl = document.createElement('div');
+      const statusClass = ev.status === 'savedate' ? 'savedate' : 'confirmed';
+      evEl.className = `list-event ${statusClass} t-${ev.type}`;
+      const statusLabel = ev.status === 'savedate' ? 'Save the Date' : 'Confirmado';
+      evEl.innerHTML = `
+        <div class="list-event-info">
+          <div class="list-event-status-row">
+            <span class="status-badge ${statusClass}">${statusLabel}</span>
+            <span class="list-event-title">${escapeHtml(ev.title)}</span>
           </div>
-          ${ev.price ? `<div class="list-event-price">${escapeHtml(ev.price)}</div>` : ''}
-        `;
-        evEl.onclick = () => openDayDetail(key);
-        events.appendChild(evEl);
-      });
-    }
+          <div class="list-event-meta">${ev.time ? ev.time + ' · ' : ''}${ev.location ? escapeHtml(ev.location) + ' · ' : ''}${typeName(ev.type)}${ev.author ? ' · por ' + escapeHtml(ev.author) : ''}</div>
+        </div>
+        ${ev.price ? `<div class="list-event-price">${escapeHtml(ev.price)}</div>` : ''}
+      `;
+      evEl.onclick = () => openDayDetail(key);
+      events.appendChild(evEl);
+    });
     dayCard.appendChild(events);
     container.appendChild(dayCard);
-  }
+  });
 
   // bind add buttons
   container.querySelectorAll('[data-add-key]').forEach(btn => {
