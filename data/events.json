@@ -81,9 +81,10 @@
       "price": "",
       "link": "",
       "author": "Ju",
-      "date": "2026-05-30",
+      "date": "2026-05-31",
       "suggestedDates": [],
-      "createdAt": 1777924538214
+      "createdAt": 1777924538214,
+      "updatedAt": 1778012610975
     },
     {
       "id": "moroy5p3aqxdb1",
@@ -173,5 +174,5 @@
       "createdAt": 1778012503847
     }
   ],
-  "updatedAt": 1778012504226
+  "updatedAt": 1778012611403
 }
