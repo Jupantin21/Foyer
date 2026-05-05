@@ -139,7 +139,21 @@
       "date": "2026-05-10",
       "createdAt": 1777929173342,
       "updatedAt": 1777929215762
+    },
+    {
+      "id": "mosro8tdcn0n03",
+      "status": "confirmado",
+      "title": "Ópera - Tristão e Isolda",
+      "type": "teatro",
+      "time": "17:00",
+      "location": "Theatro Municipal de SP",
+      "price": "",
+      "link": "",
+      "author": "Ju",
+      "date": "2026-08-01",
+      "suggestedDates": [],
+      "createdAt": 1777993919905
     }
   ],
-  "updatedAt": 1777931020314
+  "updatedAt": 1777993920333
 }
