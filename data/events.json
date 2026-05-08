@@ -169,7 +169,21 @@
       "date": "2026-05-28",
       "createdAt": 1778012503847,
       "updatedAt": 1778253341223
+    },
+    {
+      "id": "mox26bxl31nz53",
+      "status": "confirmado",
+      "title": "Chá Babyb Dino",
+      "type": "outro",
+      "time": "",
+      "location": "Jacareí",
+      "price": "",
+      "link": "",
+      "author": "Ju",
+      "date": "2026-06-06",
+      "suggestedDates": [],
+      "createdAt": 1778253424617
     }
   ],
-  "updatedAt": 1778253341888
+  "updatedAt": 1778253425052
 }
