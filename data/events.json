@@ -157,7 +157,7 @@
     },
     {
       "id": "mot2qk9zrblqna",
-      "status": "savedate",
+      "status": "confirmado",
       "title": "O Homem Decomposto",
       "type": "teatro",
       "time": "20:00",
@@ -165,14 +165,11 @@
       "price": "R$15 - 50",
       "link": "https://www.sescsp.org.br/programacao/o-homem-decomposto/",
       "author": "Ju",
-      "suggestedDates": [
-        "2026-05-22",
-        "2026-05-28",
-        "2026-05-09"
-      ],
-      "date": "2026-05-22",
-      "createdAt": 1778012503847
+      "suggestedDates": [],
+      "date": "2026-05-21",
+      "createdAt": 1778012503847,
+      "updatedAt": 1778253243183
     }
   ],
-  "updatedAt": 1778012611403
+  "updatedAt": 1778253243565
 }
