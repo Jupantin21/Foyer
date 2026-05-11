@@ -123,25 +123,6 @@
       "createdAt": 1777929088830
     },
     {
-      "id": "morp4i1qmy8s5m",
-      "status": "savedate",
-      "title": "Rei Lear - Cia Extermporânea",
-      "type": "teatro",
-      "time": "19:00",
-      "location": "Teatro Paulo Eiró",
-      "price": "Free",
-      "link": "",
-      "author": "Ju",
-      "suggestedDates": [
-        "2026-05-10",
-        "2026-05-09",
-        "2026-05-14"
-      ],
-      "date": "2026-05-10",
-      "createdAt": 1777929173342,
-      "updatedAt": 1777929215762
-    },
-    {
       "id": "mosro8tdcn0n03",
       "status": "confirmado",
       "title": "Ópera - Tristão e Isolda",
@@ -203,5 +184,5 @@
       "createdAt": 1778523915736
     }
   ],
-  "updatedAt": 1778523916933
+  "updatedAt": 1778523959879
 }
