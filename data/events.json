@@ -183,7 +183,25 @@
       "date": "2026-06-06",
       "suggestedDates": [],
       "createdAt": 1778253424617
+    },
+    {
+      "id": "mp1j7w7snhq7bg",
+      "status": "savedate",
+      "title": "Rosencrantz e Guildenstein estão mortos",
+      "type": "teatro",
+      "time": "20:30",
+      "location": "Nu Cine Copan",
+      "price": "",
+      "link": "https://www.circuitoculturalticket.com.br/",
+      "author": "Ju",
+      "suggestedDates": [
+        "2026-05-24",
+        "2026-05-31",
+        "2026-06-07"
+      ],
+      "date": "2026-05-24",
+      "createdAt": 1778523915736
     }
   ],
-  "updatedAt": 1778253425052
+  "updatedAt": 1778523916933
 }
